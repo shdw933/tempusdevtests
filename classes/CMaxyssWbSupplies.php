@@ -244,7 +244,7 @@ class CMaxyssWbSupplies{
             $this->warehouseId = $warehouseId;
 
             if(strlen($this->warehouseId) <= 0){
-                // надо запросить сведения о заказе повторно и заполнить данные о складе - переходный период
+                // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
                 if($this->property_warehuosesid){
                     $res_orders_new = array();
                     $res_orders_new = CRestQueryWB::rest_order_na($base_url = 'https://suppliers-api.wildberries.ru', '', "/api/v3/orders/new", $this->settings['AUTHORIZATION']);
@@ -287,7 +287,7 @@ class CMaxyssWbSupplies{
                     }
                     else
                     {
-                        // не смогли получить сведения о заказе и складе заказа
+                        // пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
                         $result['error'] = GetMessage('WB_MAXYSS_ORDER_GET_ERROR');
                         return $result;
                     }
@@ -301,7 +301,7 @@ class CMaxyssWbSupplies{
 
             if($this->warehouseId) {
                 if (empty($arSupliesNotDone)) {
-                    // нет открытых поставок - создадим новую
+                    // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
                     $warehouses = CRestQueryWB::rest_warehouses_get($this->settings['AUTHORIZATION']);
                     if (is_array($warehouses)) {
                         foreach ($warehouses as $wh) {
@@ -309,35 +309,35 @@ class CMaxyssWbSupplies{
                         }
                         if ($name_new_supplie != '') $this->addSupplies($name_new_supplie);
                         if ($this->supplie['supplyId'] != '') {
-                            // создалась новая поставка - можем прицепить к ней заказ
+                            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
                             $result = $this->addOrderToSupplie($id_order, $this->supplie['supplyId']);
                             return $result;
                         } else {
-                            // не создалась поставка
+                            // пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                             $result['error'] = $this->supplie['error'];
                             return $result;
                         }
                     } else {
-                        // не удалось получить список складов
+                        // пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                         $result['error'] .= GetMessage('WB_MAXYSS_WAREHOUSE_GET_ERROR');
                         return $result;
                     }
                 } else {
-                    // есть открытые поставки  - найдем нужную
+                    // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ  - пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
                     $warehouses = CRestQueryWB::rest_warehouses_get($this->settings['AUTHORIZATION']);
                     if (is_array($warehouses)) {
                         if (count($warehouses) == 1) {
-                            // один склад - все равно куда цеплять заказ - прицепим к первой попавшейся поставке
+                            // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                             $result = $this->addOrderToSupplie($id_order, $arSupliesNotDone[0]['id']);
                             return $result;
                         } else {
-                            // несколько складов - ищем нужную поставку
+                            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                             $flag_find_supplie = false;
                             foreach ($warehouses as $wh) {
                                 if ($wh['id'] == $this->warehouseId) {
                                     foreach ($arSupliesNotDone as $sup) {
                                         if ($sup['name'] == $wh['name'] . ' / ' . $wh['id']) {
-                                            // нашлась поставка с нужным именем
+                                            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
                                             $result = $this->addOrderToSupplie($id_order, $sup['id']);
                                             $flag_find_supplie = true;
                                         }
@@ -347,17 +347,17 @@ class CMaxyssWbSupplies{
                             if ($flag_find_supplie) {
                                 return $result;
                             } else {
-                                // нет поставки с нужным именем значит нужно создавать
+                                // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                                 foreach ($warehouses as $wh) {
                                     if ($wh['id'] == $this->warehouseId) $name_new_supplie = $wh['name'] . ' / ' . $wh['id'];
                                 }
                                 if ($name_new_supplie != '') $this->addSupplies($name_new_supplie);
                                 if ($this->supplie['supplyId'] != '') {
-                                    // создалась новая поставка - можем прицепить к ней заказ
+                                    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
                                     $result = $this->addOrderToSupplie($id_order, $this->supplie['supplyId']);
                                     return $result;
                                 } else {
-                                    // не создалась поставка
+                                    // пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                                     $result['error'] = $this->supplie['error'];
                                     return $result;
                                 }
@@ -365,7 +365,7 @@ class CMaxyssWbSupplies{
 
                         }
                     } else {
-                        // не удалось получить список складов
+                        // пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                         $result['error'] = GetMessage('WB_MAXYSS_WAREHOUSE_GET_ERROR');
                         return $result;
                     }
