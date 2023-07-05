@@ -136,9 +136,7 @@ class RestClient implements Iterator, ArrayAccess
         $curlopt = [
             CURLOPT_HEADER => TRUE,
             CURLOPT_RETURNTRANSFER => TRUE,
-            CURLOPT_USERAGENT => $client->options['user_agent'],
-			//CURLOPT_FRESH_CONNECT => true,
-			//CURLOPT_HTTPHEADER => array("Cache-Control: no-cache"),
+            CURLOPT_USERAGENT => $client->options['user_agent']
         ];
 
         if ($client->options['username'] && $client->options['password'])
@@ -146,7 +144,7 @@ class RestClient implements Iterator, ArrayAccess
                 $client->options['username'], $client->options['password']);
 
         if (count($client->options['headers']) || count($headers)) {
-            $curlopt[CURLOPT_HTTPHEADER] = ["Cache-Control: no-cache"];
+            $curlopt[CURLOPT_HTTPHEADER] = [];
             $headers = array_merge($client->options['headers'], $headers);
             foreach ($headers as $key => $values) {
                 foreach (is_array($values) ? $values : [$values] as $value) {

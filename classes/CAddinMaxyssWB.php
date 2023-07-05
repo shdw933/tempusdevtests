@@ -254,13 +254,46 @@ class CAddinMaxyssWB{
                     else
                     {
                         if ($property[$sinc_set[$char['name']][$iblock_id]]['PROPERTY_TYPE'] == 'L' || ($property[$sinc_set[$char['name']][$iblock_id]]['PROPERTY_TYPE'] == 'S' && empty($property[$sinc_set[$char['name']][$iblock_id]]['USER_TYPE_SETTINGS'])))
-                        { // строка или число
+                        { // ������ ��� �����
                             if($char['maxCount'] > 1)
                                 $val[] = ($char['charcType'] == 1)? strval($property[$sinc_set[$char['name']][$iblock_id]]['VALUE']) : floatval($property[$sinc_set[$char['name']][$iblock_id]]['VALUE']);
                             else
                                 $val = ($char['charcType'] == 1)? strval($property[$sinc_set[$char['name']][$iblock_id]]['VALUE']) : floatval($property[$sinc_set[$char['name']][$iblock_id]]['VALUE']);
 
+                        }
+                        elseif ($property[$sinc_set[$char['name']][$iblock_id]]['PROPERTY_TYPE'] == 'E'){
+                            if($char['maxCount'] > 1) {
+                                if(is_array($property[$sinc_set[$char['name']][$iblock_id]]['VALUE'])){
+                                    foreach ($property[$sinc_set[$char['name']][$iblock_id]]['VALUE'] as $val_el_iblock){
+                                        if($val_el_iblock > 0) {
+                                            $bd_el_iblock = CIBlockElement::GetByID($val_el_iblock);
+                                            if ($ar_el_iblock = $bd_el_iblock->GetNext())
+                                                $val[] = ($char['charcType'] == 1) ? strval($ar_el_iblock['NAME']) : floatval($ar_el_iblock['NAME']);
+                                        }
+                                    }
+                                }
+                                elseif($property[$sinc_set[$char['name']][$iblock_id]]['VALUE'] > 0)
+                                {
+                                    $bd_el_iblock = CIBlockElement::GetByID($property[$sinc_set[$char['name']][$iblock_id]]['VALUE']);
+                                    if ($ar_el_iblock = $bd_el_iblock->GetNext())
+                                        $val[] = ($char['charcType'] == 1) ? strval($ar_el_iblock['NAME']) : floatval($ar_el_iblock['NAME']);
+                                }
+                            }
+                            else
+                            {
+                                if(is_array($property[$sinc_set[$char['name']][$iblock_id]]['VALUE']) && $property[$sinc_set[$char['name']][$iblock_id]]['VALUE'][0] > 0){
+                                    $bd_el_iblock = CIBlockElement::GetByID($property[$sinc_set[$char['name']][$iblock_id]]['VALUE'][0]);
+                                    if ($ar_el_iblock = $bd_el_iblock->GetNext())
+                                        $val = ($char['charcType'] == 1)? strval($ar_el_iblock['NAME']) : floatval($ar_el_iblock['NAME']);
 
+                                }
+                                elseif($property[$sinc_set[$char['name']][$iblock_id]]['VALUE'] > 0)
+                                {
+                                    $bd_el_iblock = CIBlockElement::GetByID($property[$sinc_set[$char['name']][$iblock_id]]['VALUE']);
+                                    if ($ar_el_iblock = $bd_el_iblock->GetNext())
+                                        $val = ($char['charcType'] == 1)? strval($ar_el_iblock['NAME']) : floatval($ar_el_iblock['NAME']);
+                                }
+                            }
                         }
                         elseif ($property[$sinc_set[$char['name']][$iblock_id]]['PROPERTY_TYPE'] == 'S' && !empty($property[$sinc_set[$char['name']][$iblock_id]]['USER_TYPE_SETTINGS']))
                         {
@@ -301,7 +334,7 @@ class CAddinMaxyssWB{
 
             $lid = $arSettings['SITE'];
 
-            $arSelect = Array("ID", "IBLOCK_ID", "NAME", "PREVIEW_TEXT", "DETAIL_TEXT", "TAGS", $arSettings['BASE_PICTURE'], $arSettings['DESCRIPTION'], "PROPERTY_PROP_MAXYSS_WB", "PROPERTY_PROP_MAXYSS_CARDID_WB", "PROPERTY_".$arSettings['DESCRIPTION']);
+            $arSelect = Array("ID", "IBLOCK_ID", "NAME", "TAGS", $arSettings['BASE_PICTURE'], $arSettings['DESCRIPTION'], "PROPERTY_PROP_MAXYSS_WB", "PROPERTY_PROP_MAXYSS_CARDID_WB", "PROPERTY_".$arSettings['DESCRIPTION']);
             if($arSettings['BRAND'] != '') $arSelect[] = "PROPERTY_".$arSettings['BRAND'];
             if($arSettings['SHKOD'] != '') $arSelect[] = "PROPERTY_".$arSettings['SHKOD'];
             if($arSettings['ARTICLE'] != '') $arSelect[] = "PROPERTY_".$arSettings['ARTICLE'];
@@ -399,39 +432,20 @@ class CAddinMaxyssWB{
                 }
                 $addin_card[] = array($addin['type']=>$params);
             }
-            
-			$description = '';
-            /*if($arSettings['DESCRIPTION'] == 'DETAIL_TEXT' ||$arSettings['DESCRIPTION'] == 'PREVIEW_TEXT')
+            $description = '';
+            if($arSettings['DESCRIPTION'] == 'DETAIL_TEXT' ||$arSettings['DESCRIPTION'] == 'PREVIEW_TEXT')
                 $description = $arFields[$arSettings['DESCRIPTION']];
             elseif($arSettings['DESCRIPTION'] != '')
                 $description = (is_array($arProps[$arSettings['DESCRIPTION']]["~VALUE"]))? $arProps[$arSettings['DESCRIPTION']]["~VALUE"]["TEXT"] : $arProps[$arSettings['DESCRIPTION']]["~VALUE"];
-			*/
-			
-			// op
-			$arSection = getSectionsElement($arFields["ID"]);
-			$dsc1 = "Оригинальные " . mb_strtolower($arProps["TYPE"]["VALUE"][0]) . " " . mb_strtolower($arSection[0]["NAME"]) . " {$arSection[1]["NAME"]} {$arSection[2]["NAME"]} {$arProps["CML2_ARTICLE"]["VALUE"]}";
-			
-			$dsc2 = strip_tags($arFields["PREVIEW_TEXT"]);
-			$dsc3 = strip_tags($arFields["DETAIL_TEXT"]);
-			//$dsc2 = $arFields["PREVIEW_TEXT"];
-			//$dsc3 = $arFields["DETAIL_TEXT"];
-				
-			$description = $dsc1 . ($dsc2 ? " " . $dsc2 : "") . ($dsc3 ? " " . $dsc3 : "");
-			
-			$description = htmlentities($description);
-			$description = trim(str_replace(array("&nbsp;", "&bull;", "&ndash;", "±", "«", "»", "—", "\r\n", "&plusmn;", "&laquo;", "&raquo;"), array(" ", " - ", "-", "+/-", "'", "'", "-", " ", "+/-", "'", "'"), $description));
-			$description = str_replace(array("    ", "   ", "  "), " ", $description);
-			
-//file_put_contents("/home/bitrix/logs/wb/description.txt", print_r($description, true) . "\r\n");
+
             $name = '';
             if ($arSettings['NAME_PRODUCT'] == 'NAME')
                 $name = $arFields['NAME'];
             elseif ($arSettings['NAME_PRODUCT'] != '')
                 $name = (is_array($arProps[$arSettings['NAME_PRODUCT']]["~VALUE"])) ? $arProps[$arSettings['NAME_PRODUCT']]["~VALUE"]["TEXT"] : $arProps[$arSettings['NAME_PRODUCT']]["~VALUE"];
 
-            //$addin_card[] = array(GetMessage('WB_MAXYSS_DESCRIPTION')=> TruncateText(str_replace('&nbsp;', ' ', htmlentities(HTMLToTxt($description, $arSettings['SERVER_NAME']))), 4997) );
-            $addin_card[] = array(GetMessage('WB_MAXYSS_DESCRIPTION')=> TruncateText($description, 997));// op
-			$addin_card[] = array( GetMessage('WB_MAXYSS_PREDMET')=>$object );
+            $addin_card[] = array(GetMessage('WB_MAXYSS_DESCRIPTION')=> TruncateText(str_replace('&nbsp;', ' ', htmlentities(HTMLToTxt($description, $arSettings['SERVER_NAME']))), 4997) );
+            $addin_card[] = array( GetMessage('WB_MAXYSS_PREDMET')=>$object );
 
             if(!isset($addin_card[GetMessage('MAXYSS_WB_NAME_NAME')])) {
                 $addin_card[] = array( GetMessage('MAXYSS_WB_NAME_NAME')=>  TruncateText($name, 57));
@@ -492,37 +506,16 @@ class CAddinMaxyssWB{
                     $land = '';
                 }
             }
-			
-			// op
-			$article_dop = '';
-			$arLand = array(
-				"Австрия" => "Австрия",
-				"Беларусь" => "Беларусь",
-				"Великобритания" => "Соединенное королевство",
-				"Китай" => "Китай",
-				"Россия" => "Россия",
-				"Тайланд" => "Тайланд",
-				"Филиппины" => "Филиппины",
-				"Швейцария" => "Швейцария",
-				"Швеция" => "Швеция",
-				"Япония" => "Япония",
-				"Южная Корея" => "Республика Корея",
-			);
-
-			if($arLand[$land]) $land = $arLand[$land];
-            
-			if($land){
-				$addin_card[] = array("Страна производства" => $land);
-			}
+            $article_dop = '';
 //            if($arVarProp['colors']) {
 //                $article_dop = '_' . str_replace(' ', '', $arVarProp['colors']);
 //            }
 //            else
 //                $article_dop = '_0';
 
-            //if($land != ''){
-            //    $addin_card[] = array( GetMessage('MAXYSS_WB_STRANA') => $land);
-            //}
+            if($land != ''){
+                $addin_card[] = array( GetMessage('MAXYSS_WB_STRANA') => $land);
+            }
 
             $item = array(
                 "VendorCode" => ($arSettings['ARTICLE']=='')? $arFields['ID'] : $arFields["PROPERTY_".strtoupper($arSettings['ARTICLE'])."_VALUE"],
@@ -536,24 +529,6 @@ class CAddinMaxyssWB{
                 ),
                 "characteristics" => $addin_card,
             );
-			
-			// op
-			if(is_array($arProps['PROP_MAXYSS_NMID_CREATED_WB']["DESCRIPTION"])){
-                $keyNMID = array_search($cabinet, $arProps['PROP_MAXYSS_NMID_CREATED_WB']["DESCRIPTION"]);
-            }
-			if(is_array($arProps['PROP_MAXYSS_CHRTID_CREATED_WB']["DESCRIPTION"])){
-                $keyCHRTID = array_search($cabinet, $arProps['PROP_MAXYSS_CHRTID_CREATED_WB']["DESCRIPTION"]);
-            }
-			
-			if ($arProps['PROP_MAXYSS_NMID_CREATED_WB']['VALUE'][$keyNMID] > 0) {
-				$item['nmID'] = intval($arProps['PROP_MAXYSS_NMID_CREATED_WB']['VALUE'][$keyNMID]);
-			}
-			
-			if ($arProps['PROP_MAXYSS_CHRTID_CREATED_WB']['VALUE'][$keyCHRTID] > 0) {
-				$item['sizes'][0]['chrtID'] = intval($arProps['PROP_MAXYSS_CHRTID_CREATED_WB']['VALUE'][$keyCHRTID]);
-			}
-			
-			/*
             if(is_array($arProps['PROP_MAXYSS_CARDID_WB']["DESCRIPTION"]))
                 $key_cabinet = array_search($cabinet, $arProps['PROP_MAXYSS_CARDID_WB']["DESCRIPTION"]);
             if($cabinet == "DEFAULT" && $key_cabinet===false && is_array($arProps['PROP_MAXYSS_CARDID_WB']["DESCRIPTION"])){
@@ -567,7 +542,7 @@ class CAddinMaxyssWB{
                     $item['nmID'] = intval($arProps['PROP_MAXYSS_NMID_CREATED_WB']['VALUE'][$key_cabinet]);
                     $item['sizes'][0]['chrtID'] = intval($arProps['PROP_MAXYSS_CHRTID_CREATED_WB']['VALUE'][$key_cabinet]);
                 }
-            }*/
+            }
 
             if(array_key_exists('colors', $arVarProp) && !isset($item['characteristics'][GetMessage("WB_MAXYSS_COLOR_NOM")])){
                 $item['characteristics'][] = array(GetMessage("WB_MAXYSS_COLOR_NOM")=>  $arVarProp['colors'] );
@@ -590,16 +565,6 @@ class CAddinMaxyssWB{
             $eventLog = new \CEventLog;
             $eventLog->Add(array("SEVERITY" => 'INFO', "AUDIT_TYPE_ID" => 'str_result', "MODULE_ID" => MAXYSS_WB_NAME, "ITEM_ID" => "PrepareItemNewApiContent", "DESCRIPTION" => serialize($item) ));
         }
-		
-		// op 
-		$brand = $addin_card[0]["Бренд"]["0"];
-		if(in_array($brand, array("Michael Kors EU", "Emporio Armani", "Emporio Armani EU", "Diesel", "Fossil", "DKNY EU", "ANNE KLEIN", "SKAGEN", "Armani Exchange EU", "Esprit", "Gc", "Nautica"))){
-			$img = array_slice($img, 1, 29);
-			$img[] = "/home/bitrix/ext_www/tempusshop.ru/upload/14988.jpg";
-		}else{
-			$img = array_slice($img, 1, 30);
-		}
-		
         return array('item'=>$item, 'img'=>$img, 'props' => $arVarProp, 'article_link' => $article_link, 'predmet'=>$object, 'ar_prop_element'=>$arProps);
     }
 
