@@ -2,6 +2,7 @@
 use \Bitrix\Main\Config\Option;
 
 class CMaxyssWbprice{
+	public static $fileExclude = '/home/bitrix/ext_www/tempusshop.ru/upload/wb/items_excluded.txt';// op
     public static function getPrices($Authorization = false){
 
         if(!$Authorization) $Authorization = CMaxyssWb::get_setting_wb("AUTHORIZATION", "DEFAULT");
@@ -23,16 +24,24 @@ class CMaxyssWbprice{
         return $arResult;
     }
 
-    public static function setPrices($Authorization = false, $items){
+    public static function setPrices($Authorization = false, $items, $attempt = 1){
+		
         if(!$Authorization) $Authorization = CMaxyssWb::get_setting_wb("AUTHORIZATION", "DEFAULT");
-
+		if($attempt > 3) return;
+		if($attempt == 1){
+			fopen(self::$fileExclude, "w+");
+		}
         $event = new \Bitrix\Main\Event(MAXYSS_WB_NAME, "OnPriceUpload", array(&$items, $Authorization));
         $event->send();
+		
 
+		
         $arResult = array();
         $items_chunk = array_chunk($items, 1000);
 
+        file_put_contents($_SERVER['DOCUMENT_ROOT'].'/upload/log_items.txt', print_r($items_chunk, true));
         $err = '';
+		$arExclude = array();
         foreach ($items_chunk as $c) {
             $data_string = $c;
             $data_string = \Bitrix\Main\Web\Json::encode($data_string);
@@ -50,9 +59,24 @@ class CMaxyssWbprice{
                     $eventLog->Add(array("SEVERITY" => 'INFO', "AUDIT_TYPE_ID" => 'setPrices', "MODULE_ID" => MAXYSS_WB_NAME, "ITEM_ID" => "PRICE", "DESCRIPTION" => "upload price success" ));
                 }else{
                     $res_error = \Bitrix\Main\Web\Json::decode($result['error']);
+					
+					// запоминаем ошибки. при следующем запуске исключаем их
                     foreach ($res_error['errors'] as $val){
                         $err .= $val;
+						//Рост более 30 процентов
+						if(strripos($val, "Рост более ")){
+							preg_match("/\[(.*?)\]/ism", $val, $output);
+							if($output[1]){
+								$list = explode(" ", $output[1]);
+								if(count($list) > 0){
+									$arExclude = array_merge($arExclude, $list);
+								}
+							}
+							
+						}
                     }
+
+					
 //                    if(LANG_CHARSET != 'utf-8') {
 //                        $arResult["error"] = \Bitrix\Main\Text\Encoding::convertEncoding(
 //                            $result['errors'],
@@ -66,8 +90,23 @@ class CMaxyssWbprice{
                     $eventLog = new \CEventLog;
                     $eventLog->Add(array("SEVERITY" => 'INFO', "AUDIT_TYPE_ID" => 'setPrices', "MODULE_ID" => MAXYSS_WB_NAME, "ITEM_ID" => "PRICE", "DESCRIPTION" => implode(', ', $res_error['errors']) ));
                 }
-            }
+            }else{
+				file_put_contents("/home/bitrix/logs/wb/wb_err.txt", print_r(json_decode($c, true), true) . "\r\n", FILE_APPEND | LOCK_EX);
+				file_put_contents("/home/bitrix/logs/wb/wb_err.txt", print_r(json_decode($bck, true), true) . "\r\n", FILE_APPEND | LOCK_EX);
+			}
         }
+		
+		if(count($arExclude) > 0){
+			foreach($arExclude as $nmId){
+				file_put_contents(self::$fileExclude, $nmId . "\r\n", FILE_APPEND | LOCK_EX);
+			}
+			CMaxyssWbprice::prepareSetPrice($items);
+			$eventLog->Add(array("SEVERITY" => 'INFO', "AUDIT_TYPE_ID" => 'setPrices', "MODULE_ID" => MAXYSS_WB_NAME, "ITEM_ID" => "PRICE", "DESCRIPTION" => "Найдено " . count($arExclude) . " ошибок. Шлем без них. Попытка - {$attempt}." ));
+                
+			self::setPrices($Authorization, $items, $attempt + 1);
+		}
+
+					
         return $arResult;
     }
 
@@ -242,4 +281,16 @@ class CMaxyssWbprice{
         }
         return $arResult;
     }
+
+	public static function prepareSetPrice(&$items){
+		$res = file_get_contents(self::$fileExclude); 
+
+		$arNmId = explode("\r\n", $res);
+		
+		foreach ($items as $key => $arItem){
+			if(in_array($arItem["nmId"], $arNmId)){
+				unset($items[$key]);
+			}
+		}
+	}
 }

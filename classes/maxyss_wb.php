@@ -110,7 +110,11 @@ class CRestQueryWB{
 
 
         $str_result = $api->post($path, []);
-
+		
+		$Logger = new TsLogger("/wb/" . str_replace("/", "_", $path) . "/");
+		$Logger->log("LOG", "data_string - ".print_r($data_string, true));
+		$Logger->log("LOG", "str_result - ".print_r($str_result, true));
+		
         if(CMaxyssWb::get_setting_wb_for_auth('LOG_ON', $Authorization) == "Y") {
             $eventLog = new \CEventLog;
             $eventLog->Add(array("SEVERITY" => 'INFO', "AUDIT_TYPE_ID" => 'str_result', "MODULE_ID" => MAXYSS_WB_NAME, "ITEM_ID" => "str_result", "DESCRIPTION" => serialize($str_result)));
@@ -189,7 +193,7 @@ class CRestQueryWB{
         return $result;
     }
 
-    public static function rest_warehouses_get($Authorization = false, $base_url = WB_BASE_URL, $data_string = '', $path='/api/v3/warehouses')
+    public static function rest_warehouses_get($Authorization = false, $base_url = WB_BASE_URL, $data_string = '', $path='/api/v2/warehouses')
     {
 
         if(!$Authorization) $Authorization = CMaxyssWb::get_setting_wb("AUTHORIZATION", "DEFAULT");
@@ -448,7 +452,7 @@ class CRestQueryWB{
             ]);
 
 
-            $str_result = $api->post($path, []);
+            $str_result = $api->post($path, []);prent($str_result);
             if($str_result->info->http_code == 200)
             {
 //                $res = \Bitrix\Main\Web\Json::decode($str_result->response);
@@ -716,34 +720,6 @@ class CHelpMaxyssWB{
         }
         return $res;
     }
-    public static function memory_ms($print = false, $clear = false, $flag = 'MAXYSS_MEM'){
-        if($clear) $GLOBALS[$flag] = array();
-        $GLOBALS[$flag][] = memory_get_usage();
-        $name = array('áàéò', 'ÊÁ', 'ÌÁ');
-        $arMem = array();
-        if(!empty($GLOBALS[$flag])) {
-            $mem = $GLOBALS[$flag];
-            foreach ($mem as $key => $m) {
-                if ($key > 0) {
-                    $memory = $m - $mem[$key - 1];
-                    $i = 0;
-                    while (floor($memory / 1024) > 0) {
-                        $i++;
-                        $memory /= 1024;
-                    }
-                    $arMem[] = round($memory, 2) . ' ' . $name[$i];
-                }
-            }
-            $memoryall = $mem[$key] - $mem[0];
-            $i = 0;
-            while (floor($memoryall / 1024) > 0) {
-                $i++;
-                $memoryall /= 1024;
-            }
-            $arMem[] = round($memoryall, 2) . ' ' . $name[$i];
-        }
-        if($print) echo '<pre>', print_r($arMem), '</pre>' ; ;
-    }
 }
 class CMaxyssWbEvents{
     public static function ElementUpdate(&$arFields)
@@ -908,11 +884,7 @@ class CMaxyssWbEvents{
 
                                                                 if (!empty($value) && $old_value == '') {
                                                                     $prop->setValue($value);
-
-                                                                    $event = new \Bitrix\Main\Event(MAXYSS_WB_NAME, "OnStikerNew", array(&$order, $val_sticker['orderId'], $val_sticker));
-                                                                    $event->send();
-
-//                                                                    $order->save();
+                                                                    $order->save();
                                                                     break;
                                                                 }
                                                             }
@@ -1004,17 +976,12 @@ class CMaxyssWbEvents{
             $list->arActions['wb_upload'] = array(
                 'name' => GetMessage("WB_MAXYSS_CONTEXT_MENU"),
                 'type' => 'customJs',
-                'js' => 'uploadSelectItems(BX.Main.gridManager.getById(\''.$list->table_id.'\').instance.rows.getSelectedIds(), 0)'
+                'js' => 'uploadSelectItems(BX.Main.gridManager.getById(\''.$list->table_id.'\').instance.rows.getSelectedIds())'
             );
             $list->arActions['wb_get_id'] = array(
                 'name' => GetMessage("WB_MAXYSS_CONTEXT_MENU_GET"),
                 'type' => 'customJs',
                 'js' => 'getWBAttributesSelectItems(BX.Main.gridManager.getById(\''.$list->table_id.'\').instance.rows.getSelectedIds())'
-            );
-            $list->arActions['wb_get_photo'] = array(
-                'name' => GetMessage("WB_MAXYSS_UPLOAD_WB_PHOTO"),
-                'type' => 'customJs',
-                'js' => 'uploadSelectItems(BX.Main.gridManager.getById(\''.$list->table_id.'\').instance.rows.getSelectedIds(), \'photo\')'
             );
         }
     }
