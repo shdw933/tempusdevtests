@@ -1936,9 +1936,6 @@ $Logger = new TsLogger("/wb/uploadAllStocks/");
 $Logger->log("LOG", "stocks orig - ".print_r($items["stocks"], true));
 $Logger->log("LOG", "itemsAvail - ".print_r($itemsAvail, true));
 
-		file_put_contents("/home/bitrix/logs/wb/uploadAllStocks/last_updateStock_1.txt", print_r($items["stocks"], true));
-		file_put_contents("/home/bitrix/logs/wb/uploadAllStocks/last_updateStock_itemsAvail.txt", print_r($itemsAvail, true));
-
 		foreach ($items["stocks"] as $wh => $skus){
 			foreach ($skus as $k => $arItem){
 				if($itemsAvail[$arItem["sku"]]){
@@ -1956,7 +1953,30 @@ $Logger->log("LOG", "itemsAvail - ".print_r($itemsAvail, true));
 			}
 		}
 
-		file_put_contents("/home/bitrix/logs/wb/uploadAllStocks/last_updateStock_2.txt", print_r($items["stocks"], true));
+		foreach($items["stocks"] as $key => &$arItem){
+			if($itemsAvail[$arItem["barcode"]] || $itemsAvail[$arItem["sku"]]){
+
+				if($arItem["barcode"])
+					$b_price = $itemsAvail[$arItem["barcode"]]["PROPERTY_WBPRICE_VALUE"] / 100 * (100 - $sale_per) / (100 / (100 - $promo_per));
+				elseif($arItem["sku"])
+					$b_price = $itemsAvail[$arItem["sku"]]["PROPERTY_WBPRICE_VALUE"] / 100 * (100 - $sale_per) / (100 / (100 - $promo_per));
+
+				if($b_price >= 50 && $b_price <= 50000){
+					$arItem["stock"] = 3;
+					$arItem["amount"] = 3;
+				}else{
+					$arItem["stock"] = 0;
+					$arItem["amount"] = 0;
+				}
+			}else{
+				$arItem["stock"] = 0;
+				$arItem["amount"] = 0;
+			}
+
+			//                                        "sku" => strval($arFields["PROPERTY_" . strtoupper($iblock_shkod) . "_VALUE"]),
+            //                            "amount" => intval(($wh <= 100000)? $wh : 100000),
+		}
+		unset($arItem);
 
 $Logger->log("LOG", "stocks - ".print_r($items["stocks"], true));
 		if(!empty($items["stocks"])) {
