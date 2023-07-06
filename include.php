@@ -106,9 +106,9 @@ class CMaxyssWb{
         $arSettings['BASE_PICTURE'] = unserialize(Option::get(MAXYSS_WB_NAME, "BASE_PICTURE", "DETAIL_PICTURE"));
         $arSettings['MORE_PICTURE'] = unserialize(Option::get(MAXYSS_WB_NAME, "MORE_PICTURE", ""));
         $arSettings['SERVER_NAME'] = unserialize(Option::get(MAXYSS_WB_NAME, "SERVER_NAME", $_SERVER["HTTP_HOST"]));
-        //$arSettings['SKLAD'] = unserialize(Option::get(MAXYSS_WB_NAME, "SKLAD", ''));
-
-		// op
+        //$arSettings['SKLAD'] = unserialize(Option::get(MAXYSS_WB_NAME, "SKLAD", ''));		
+		
+		// op 
 		$arSettings['SKLAD'] = 210731;
         $arSettings['LAND'] = unserialize(Option::get(MAXYSS_WB_NAME, "LAND",''));
 
@@ -667,7 +667,7 @@ class CMaxyssWb{
                     if (!empty($tags)) {
 						// op обезаем до 3
 						$tags = array_slice($tags, 0, 3);
-
+						
                         $addin_card[] = array(
                             'type' => GetMessage('WB_MAXYSS_KEYWORD'),
                             'params' => $tags
@@ -737,7 +737,7 @@ class CMaxyssWb{
 			);
 
 			if($arLand[$land]) $land = $arLand[$land];
-
+			
             $item = array(
                 "supplierID" => $arSettings['UUID'],
                 "card" => array(
@@ -818,8 +818,8 @@ class CMaxyssWb{
                 );
             }
         }
-
-		// op
+				
+		// op 
 		$brand = $addin_card[0]["params"]["0"]["value"];
 		if(in_array($brand, array("Michael Kors EU", "Emporio Armani", "Emporio Armani EU", "Diesel", "Fossil", "DKNY EU", "ANNE KLEIN", "SKAGEN", "Armani Exchange EU", "Esprit", "Gc", "Nautica"))){
 			$img = array_slice($img, 1, 29);
@@ -1197,11 +1197,11 @@ class CMaxyssWb{
     public static function prepareAllItemsStock($arSettings, $arrFilter, $cabinet = "DEFAULT"){
         $IBLOCK_ID = $arSettings["IBLOCK_ID"];
         $arInfoOff = CCatalogSKU::GetInfoByProductIBlock($IBLOCK_ID);
-
+				
 		// op
 		$arProp = self::getPropsSync($cabinet);
 		$arID = self::getItemsWB();
-
+		
         $cabinet =  $arSettings['LK'];
 
         $item = array();
@@ -1269,20 +1269,20 @@ class CMaxyssWb{
                 $ar_tovar = self::elemAsProduct($arFields["ID"], $arSettings); // item as product
                 if ($ar_tovar["TYPE"] == 1) {
                     $item_nmId = 0;
-
+					
 					$keyNMID = $keyCHRTID = false;
 					if(is_array($arProps['PROP_MAXYSS_NMID_CREATED_WB']["DESCRIPTION"])){
 						$keyNMID = array_search($cabinet, $arProps['PROP_MAXYSS_NMID_CREATED_WB']["DESCRIPTION"]);
 					}
-
+					
 					if(is_array($arProps['PROP_MAXYSS_CHRTID_CREATED_WB']["DESCRIPTION"])){
 						$keyCHRTID = array_search($cabinet, $arProps['PROP_MAXYSS_CHRTID_CREATED_WB']["DESCRIPTION"]);
 					}
-
+					
 					if ($keyNMID !== false && $keyCHRTID !== false && $arProps['PROP_MAXYSS_NMID_CREATED_WB']['VALUE'][$keyNMID] > 0 && $arProps['PROP_MAXYSS_CHRTID_CREATED_WB']['VALUE'][$keyCHRTID] > 0) {
 						$item_nmId = intval($arProps['PROP_MAXYSS_NMID_CREATED_WB']['VALUE'][$keyNMID]);
 					}
-
+					
                     /*if(is_array($arProps['PROP_MAXYSS_CARDID_WB']["DESCRIPTION"]))
                         $key_cabinet = array_search($cabinet, $arProps['PROP_MAXYSS_CARDID_WB']["DESCRIPTION"]);
                     if($cabinet == "DEFAULT" && $key_cabinet===false && is_array($arProps['PROP_MAXYSS_CARDID_WB']["DESCRIPTION"])){
@@ -1293,7 +1293,7 @@ class CMaxyssWb{
                             $item_nmId = intval($arProps['PROP_MAXYSS_NMID_CREATED_WB']['VALUE'][$key_cabinet]);
                         }
                     }*/
-
+					
                     if ($item_nmId > 0) {
                         if ($arFields["PROPERTY_" . strtoupper($iblock_shkod) . "_VALUE"] != '') {
 
@@ -1314,8 +1314,8 @@ class CMaxyssWb{
                                     );
                                 }
                             }
-
-
+							
+							
 							if (intval($arProp[$arFields["ID"]]["PROP_MAXYSS_NMID_CREATED_WB"]["VALUE"]) > 0) {
 								$prices = array(
 									"nmId" => intval($arProp[$arFields["ID"]]["PROP_MAXYSS_NMID_CREATED_WB"]["VALUE"]),
@@ -1522,7 +1522,7 @@ class CMaxyssWb{
 		// op
 		$arProp = self::getPropsSync($cabinet);
 		$arID = self::getItemsWB();
-
+		
         $arInfoOff = CCatalogSKU::GetInfoByProductIBlock($IBLOCK_ID);
 
         $item_price = array();
@@ -1586,16 +1586,16 @@ class CMaxyssWb{
                     if($cabinet == "DEFAULT" && $key_cabinet===false && is_array($arProps['PROP_MAXYSS_CARDID_WB']["DESCRIPTION"])){
                         $key_cabinet = array_search('', $arProps['PROP_MAXYSS_CARDID_WB']["DESCRIPTION"]);
                     }*/
-
+					
 					$keyNMID = $keyCHRTID = false;
 					if(is_array($arProps['PROP_MAXYSS_NMID_CREATED_WB']["DESCRIPTION"])){
 						$keyNMID = array_search($cabinet, $arProps['PROP_MAXYSS_NMID_CREATED_WB']["DESCRIPTION"]);
 					}
-
+					
 					if(is_array($arProps['PROP_MAXYSS_CHRTID_CREATED_WB']["DESCRIPTION"])){
 						$keyCHRTID = array_search($cabinet, $arProps['PROP_MAXYSS_CHRTID_CREATED_WB']["DESCRIPTION"]);
 					}
-
+					
 					if ($keyNMID !== false && $keyCHRTID !== false && $arProps['PROP_MAXYSS_NMID_CREATED_WB']['VALUE'][$keyNMID] > 0 && $arProps['PROP_MAXYSS_CHRTID_CREATED_WB']['VALUE'][$keyCHRTID] > 0) {
 						$item_nmId = intval($arProps['PROP_MAXYSS_NMID_CREATED_WB']['VALUE'][$keyNMID]);
 					}
@@ -1616,7 +1616,7 @@ class CMaxyssWb{
 						file_put_contents($fff, "keyCHRTID - " . $keyCHRTID, FILE_APPEND);
 						file_put_contents($fff, "keyNMID - " . $keyNMID, FILE_APPEND);
 
-
+						
 					}*/
                     if ($item_nmId > 0) {
 
@@ -1752,7 +1752,7 @@ class CMaxyssWb{
 
 
         }
-
+        
 
 //file_put_contents("/home/bitrix/ext_www/tempusshop.ru/bitrix/modules/maxyss.wb/last_send.txt", print_r($item_price, true), FILE_APPEND);
 		return array("prices"=>$item_price, "discounts"=>$item_discounts, "discounts_revoke"=>$item_discounts_revoke, "promocodes"=>$item_promocodes,"promocodes_revoke"=>$item_promocodes_revoke );
@@ -1922,26 +1922,26 @@ $Logger = new TsLogger("/wb/uploadAllStocks/");
             $eventLog = new \CEventLog;
             $eventLog->Add(array("SEVERITY" => 'INFO', "AUDIT_TYPE_ID" => 'uploadAllStocks', "MODULE_ID" => MAXYSS_WB_NAME, "ITEM_ID" => "uploadAllStocks", "DESCRIPTION" => serialize($items)));
         }
-
+		
 		// меняем местами
         if(!empty($items["prices"]) && $arSettings['PRICE_ON'] == 'Y') {
                 $result_price = CMaxyssWbprice::setPrices($Authorization, $items["prices"]);
         }
-
+		
 		// op
 		$itemsAvail = self::getAllItemsAvail($arSettings);
-
+		
 		$promo_per = CProSet::getOption("CATALOG_PROMO_wb");
 		$sale_per = CProSet::getOption("CATALOG_SALE_wb");
 $Logger->log("LOG", "stocks orig - ".print_r($items["stocks"], true));
 $Logger->log("LOG", "itemsAvail - ".print_r($itemsAvail, true));
-
+		
 		foreach ($items["stocks"] as $wh => $skus){
 			foreach ($skus as $k => $arItem){
 				if($itemsAvail[$arItem["sku"]]){
-
+					
 					$b_price = $itemsAvail[$arItem["sku"]]["PROPERTY_WBPRICE_VALUE"] / 100 * (100 - $sale_per) / (100 / (100 - $promo_per));
-
+					
 					if($b_price >= 50 && $b_price <= 50000){
 						$items["stocks"][$wh][$k]["amount"] = 10;
 					}else{
@@ -1952,15 +1952,15 @@ $Logger->log("LOG", "itemsAvail - ".print_r($itemsAvail, true));
 				}
 			}
 		}
-
+			
 		foreach($items["stocks"] as $key => &$arItem){
 			if($itemsAvail[$arItem["barcode"]] || $itemsAvail[$arItem["sku"]]){
-
+				
 				if($arItem["barcode"])
 					$b_price = $itemsAvail[$arItem["barcode"]]["PROPERTY_WBPRICE_VALUE"] / 100 * (100 - $sale_per) / (100 / (100 - $promo_per));
 				elseif($arItem["sku"])
 					$b_price = $itemsAvail[$arItem["sku"]]["PROPERTY_WBPRICE_VALUE"] / 100 * (100 - $sale_per) / (100 / (100 - $promo_per));
-
+				
 				if($b_price >= 50 && $b_price <= 50000){
 					$arItem["stock"] = 3;
 					$arItem["amount"] = 3;
@@ -1972,7 +1972,7 @@ $Logger->log("LOG", "itemsAvail - ".print_r($itemsAvail, true));
 				$arItem["stock"] = 0;
 				$arItem["amount"] = 0;
 			}
-
+			
 			//                                        "sku" => strval($arFields["PROPERTY_" . strtoupper($iblock_shkod) . "_VALUE"]),
             //                            "amount" => intval(($wh <= 100000)? $wh : 100000),
 		}
@@ -1982,7 +1982,7 @@ $Logger->log("LOG", "stocks - ".print_r($items["stocks"], true));
 		if(!empty($items["stocks"])) {
             $result = self::updateStock($Authorization, $items["stocks"], $cabinet);
         }
-
+		
         if(!empty($items["discounts"]) &&  $arSettings["DISCOUNTS_ON"] == 'Y') {
             $result_discounts = CMaxyssWbprice::setDiscounts($Authorization = false, $items["discounts"]);
         }
@@ -2008,7 +2008,7 @@ $Logger->log("LOG", "stocks - ".print_r($items["stocks"], true));
         if($bck['BCK'] && $bck['BCK'] != "Y") {
             if (!empty($items)) {
                 foreach ($items as $wh => $skus){
-
+					
                     $chunkItems = array_chunk($skus, 1000);
                     foreach ($chunkItems as $key_chunk =>$chunk_item) {
 						$Logger->log("LOG", "отправляем по 1к в ВБ - ".print_r($chunk_item, true));
@@ -2028,7 +2028,7 @@ $Logger->log("LOG", "stocks - ".print_r($items["stocks"], true));
                             {
                                 $data_error.= $arResult['error']["data"];
                             }
-
+							
 							if(is_array($arResult['error']["data"]) && $arResult['error']["code"] == "NotFound"){
                                 foreach ($arResult['error']["data"] as $data){
 									if(strlen($data['sku']) > 10){
@@ -2494,10 +2494,10 @@ $Logger->log("LOG", "stocks - ".print_r($items["stocks"], true));
                 )
             );
             $data_string = \Bitrix\Main\Web\Json::encode($data_string);
-
+            				
 			if($status == 2){
 				$arSuppList = CMaxyssWb::getSuppliesList("ACTIVE");
-
+				
 				$supplyId = false;
 				if($arSuppList["supplies"]){
 					$supplyId = $arSuppList["supplies"][0]["supplyId"];
@@ -2508,7 +2508,7 @@ $Logger->log("LOG", "stocks - ".print_r($items["stocks"], true));
 					CMaxyssWb::setOrdersSupplies($supplyId, array(strval($id)));
 				}
 			}
-
+			
 			$res = CRestQueryWB::putStatus($base_url = WB_BASE_URL, $data_string, "/api/v2/orders", $Authorization);
 
             if($res['success']){
@@ -2529,7 +2529,7 @@ $Logger->log("LOG", "stocks - ".print_r($items["stocks"], true));
     }
 
     public static function loadNewOrders($cabinet = 'DEFAULT', $print=false){
-
+		
 		$unq = uniqid();
 		file_put_contents("/home/bitrix/logs/wb/loadNewOrders.txt", "start - {$unq} - " . date('Y-m-d H:i:s') . "\r\n", FILE_APPEND);
         $arSettings = self::settings_wb($cabinet);
@@ -2538,16 +2538,16 @@ $Logger->log("LOG", "stocks - ".print_r($items["stocks"], true));
         $file_log_order = $_SERVER['DOCUMENT_ROOT'] . "/bitrix/modules/" . MAXYSS_WB_NAME . "/log_order".$cabinet.".txt";
         file_put_contents($file_log_order, print_r("DATA - " . date('Y-m-d H:i:s') , true) . PHP_EOL, FILE_APPEND);
 
-
+		
         $bck = self::bck_wb();
-
+		
         if($bck['BCK'] && $bck['BCK'] != "Y") {
             $res = array();
             $res = CRestQueryWB::rest_order_na($base_url = WB_BASE_URL, '', "/api/v3/orders/new", $Authorization);
 
 			file_put_contents("/home/bitrix/logs/wb/loadNewOrders.txt", "получили ответ - {$unq} - " . date('Y-m-d H:i:s') . "\r\n", FILE_APPEND);
 			//file_put_contents("/home/bitrix/logs/wb/loadNewOrders.txt", print_r($res, true), FILE_APPEND);
-
+		
             file_put_contents($file_log_order, print_r($res, true) . PHP_EOL, FILE_APPEND);
             if ($res['note'])
                 file_put_contents($file_log_order, print_r("NOTE - " . date('Y-m-d H:i:s') . $res['note'], true) . PHP_EOL, FILE_APPEND);
@@ -2574,9 +2574,9 @@ $Logger->log("LOG", "stocks - ".print_r($items["stocks"], true));
 				}
 			}
 		}
-
+		
 		file_put_contents("/home/bitrix/logs/wb/loadNewOrders.txt", "end - {$unq} - " . date('Y-m-d H:i:s') . "\r\n", FILE_APPEND);
-
+		
         return "CMaxyssWb::loadNewOrders('".$cabinet."');";
     }
 
@@ -3078,20 +3078,20 @@ $Logger->log("LOG", "stocks - ".print_r($items["stocks"], true));
         }
     }
 
-
+	
 	// op
 	public static function getAllItemsAvail($arSettings){
 		global $DB;
-
+		
 		$strSql = "SELECT * FROM ci_wb_top";
-
-		$arIDs = array();
+			
+		$arIDs = array();	
 		$results = $DB->Query($strSql, false, $err_mess.__LINE__);
 
 		while ($row = $results->Fetch()){
 			$arIDs[$row["bitrix_id"]] = $row["bitrix_id"];
 		}
-
+		
 		//������� ��� � ��������
 		$strSql = "SELECT * FROM ci_reserved";
 
@@ -3111,7 +3111,7 @@ $Logger->log("LOG", "stocks - ".print_r($items["stocks"], true));
 		}
 
 		$arItems = array();
-
+		
 		if(CModule::IncludeModule("panel_manager")){
 			$objPricelist = new CPanelPricelist;
 			$filter = array(
@@ -3119,14 +3119,14 @@ $Logger->log("LOG", "stocks - ".print_r($items["stocks"], true));
 			);
 			$arPrice = $objPricelist->getPriceByFilter($filter, "model");
 		}
-
+		
 		$prop_barcode = $arSettings["SHKOD"];
-
+		
 		// смотрим ошибки обмена setPrices
-		$res = file_get_contents(CMaxyssWbprice::$fileExclude);
+		$res = file_get_contents(CMaxyssWbprice::$fileExclude); 
 
 		$arExcluded = explode("\r\n", $res);
-
+		
 		if(CModule::IncludeModule("iblock")){
 			$arFilter = Array(
 				"IBLOCK_ID"	=> 16,
@@ -3135,10 +3135,10 @@ $Logger->log("LOG", "stocks - ".print_r($items["stocks"], true));
 				"!PROPERTY_" . $prop_barcode => false,
 				"!PROPERTY_CML2_ARTICLE" => false,
 			);
-
+			
 			$rs = CIBlockElement::GetList(array(), $arFilter, false, false, array("ID","CODE","PROPERTY_{$prop_barcode}","PROPERTY_WBPRICE","PROPERTY_CML2_ARTICLE", "PROPERTY_PROP_MAXYSS_NMID_CREATED_WB"));
 			while($ar = $rs->GetNext()){
-
+				
 				if(count($arExcluded) > 0){
 					$key_cabinet = array_search($arSettings['LK'], $ar["PROPERTY_PROP_MAXYSS_NMID_CREATED_WB_DESCRIPTION"]);
 					if($key_cabinet !== false){
@@ -3147,7 +3147,7 @@ $Logger->log("LOG", "stocks - ".print_r($items["stocks"], true));
 						}
 					}
 				}
-
+				
 				if($arPrice[$ar["PROPERTY_CML2_ARTICLE_VALUE"]])
 					$arItems[$ar["PROPERTY_{$prop_barcode}_VALUE"]] = $ar;
 			}
@@ -3155,7 +3155,7 @@ $Logger->log("LOG", "stocks - ".print_r($items["stocks"], true));
 		//AddMessage2Log($arItems);
 		return $arItems;
 	}
-
+	
 	public static function getPropsSync($cabinet = "DEFAULT"){
 
 		global $DB;
@@ -3180,7 +3180,7 @@ $Logger->log("LOG", "stocks - ".print_r($items["stocks"], true));
 		}
 		return $VALUES;
 	}
-
+	
 	public static function getItemsWB(){
 
 		global $DB;
@@ -3202,40 +3202,40 @@ $Logger->log("LOG", "stocks - ".print_r($items["stocks"], true));
 		}
 		return array_keys($price);
 	}
-
+	
 	// возвращает Список поставок
 	public static function getSuppliesList($status = "ACTIVE"){
 		if(!in_array($status, array("ACTIVE", "ON_DELIVERY"))) return false;
 
 		$logger = new TsLogger("/wb/suppliesList/");
 		$logger->log("LOG", "Получаем список поставок status - {$status}");
-
+		
 		$data_string = [];
 
 		$data_string = \Bitrix\Main\Web\Json::encode($data_string);
-
+						
 		$result = CRestQueryWB::rest_order_na("https://suppliers-api.wildberries.ru", $data_string, "/api/v2/supplies?status={$status}");
-
+		
 		$logger->log("LOG", "Список поставок - ".print_r($result, true));
-
+		
 		return $result;
 
 	}
-
+	
 	// Добавление к поставке заказов
 	public static function setOrdersSupplies($supplyId = "", $arOrder = array()){
-
+		
 		if(!$supplyId || !$arOrder) return false;
 
 		$logger = new TsLogger("/wb/suppliesAdd/");
-
+		
 		$data_string = array(
 			"orders" => $arOrder,
 		);
-
+		
 		$logger->log("LOG", "Создаем поставку supplyId - {$supplyId}");
 		$logger->log("LOG", "data_string - ".print_r($data_string, true));
-
+		
 		$data_string = \Bitrix\Main\Web\Json::encode($data_string);
 
 		$result = CRestQueryWB::putStatus("https://suppliers-api.wildberries.ru", $data_string, "/api/v2/supplies/{$supplyId}");

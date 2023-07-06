@@ -1,0 +1,100 @@
+.required_wb{
+    font-weight: 800;
+}
+.wb_control-row td{
+    position: relative;
+}
+.wb_control-add-but,.wb_control-delete-but{
+    position: relative;
+    /*right: 0;*/
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    background-color: #3A8828;
+    color: #fff;
+    vertical-align: middle;
+    margin-left: 15px;
+    /*top: 50%;*/
+    /*transform: translateY(-50%);*/
+}
+.wb_control-delete-but{
+    background-color: #b91f20;
+}
+.wb_control-add-but:after{
+    content: '+';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: 700;
+    font-size: 20px;
+}
+.wb_control-delete-but:after{
+    content: '-';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 20px;
+}
+.wb_select-item{
+    position: absolute;
+    left: 0;
+    top: 100%;
+    background-color: #fff;
+    z-index: 2;
+    margin-top: 0;
+    padding: 5px;
+}
+.wb_select-item li{
+    white-space: nowrap;
+    padding: 5px;
+    cursor: pointer;
+    list-style: none;
+}
+.wb_select-item li:hover{
+    background-color: #ececec;
+}
+.wb_control-child td{
+    position: relative;
+}
+.wb_control-add-but:before{}
+/*.wb_control-delete-but*/
+.wb_control-wb-prop{
+    width: 400px;
+}
+.predmet_dialog{
+    position: relative;
+}
+.predmet_dialog td{
+    position: relative;
+}
+.predmet_dialog .wb_select-item{
+    padding: 0px;
+    min-width: 100%;
+}
+#object_wb{
+    display: none;
+}
+.adm-workarea .type_wb input[type="text"]{
+    display: block;
+}
+.adm-input.wb_attr{
+    min-width: 120px;
+}
+.add_prop_sinc_wb{
+    margin-right: 5px;
+    line-height: 1.6;
+    text-align: center;
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    border: #c5c5c5 solid 1px;
+    display: inline-block;
+    background-color: darkgrey;
+}
+.add_prop_sinc_wb.green{
+    background-color: green;
+}

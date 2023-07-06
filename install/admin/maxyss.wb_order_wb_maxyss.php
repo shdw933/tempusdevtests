@@ -1,0 +1,1 @@
+<? require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/maxyss.wb/admin/order_wb_maxyss.php");?>
