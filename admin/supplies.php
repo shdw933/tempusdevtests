@@ -158,17 +158,17 @@ if (Loader::includeModule('sale') && Loader::includeModule('iblock') && CModule:
 //                        if(!empty($arOrdes['orders'])){
 //                            ?>
 <!--                            <tr>-->
-<!--                                <td colspan="2"> <b>Список заказов поставки</b> </td>-->
+<!--                                <td colspan="2"> <b>пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</b> </td>-->
 <!--                            </tr>-->
 <!--                            <tr style="background-color: #e0e8ea">-->
-<!--                                <td style="padding: 5px">wb.ru</td><td  style="padding: 5px">Битрикс</td>-->
+<!--                                <td style="padding: 5px">wb.ru</td><td  style="padding: 5px">пїЅпїЅпїЅпїЅпїЅпїЅпїЅ</td>-->
 <!--                            </tr>-->
 <!--                            --><?//
 //                            foreach ($arOrdes['orders'] as $order){
 //                                ?>
 <!--                                <tr>-->
-<!--                                    <td>--><?//echo '№ '.$order["orderId"].' со склада '.$order["storeId"];?><!--</td>-->
-<!--                                    <td>--><?//echo '№ '.$order["bx_order"]['ID']?><!--</td>-->
+<!--                                    <td>--><?//echo 'пїЅ '.$order["orderId"].' пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ '.$order["storeId"];?><!--</td>-->
+<!--                                    <td>--><?//echo 'пїЅ '.$order["bx_order"]['ID']?><!--</td>-->
 <!--                                </tr>-->
 <!--                                --><?//
 //                            }
@@ -268,7 +268,7 @@ if (Loader::includeModule('sale') && Loader::includeModule('iblock') && CModule:
                                     alert(obj.errorText);
                                 }
                                 if (obj.success) {
-                                    alert('Поставка удалена');
+                                    alert('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
                                     document.location.reload();
                                     // window.location.href = "/bitrix/admin/maxyss.wb_supplies.php";
                                 }
@@ -310,7 +310,7 @@ if (Loader::includeModule('sale') && Loader::includeModule('iblock') && CModule:
                                 alert(obj.error);
                             }
                             if (obj.success) {
-                                alert('Поставка передана в доставку');
+                                alert('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
                                 document.location.reload();
                             }
                         } else {

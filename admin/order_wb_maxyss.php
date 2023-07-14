@@ -41,7 +41,7 @@ if(CModule::IncludeModuleEx(MAXYSS_WB_NAME) == 3)
 
 if(Loader::includeModule('sale') && Loader::includeModule('iblock') && CModule::IncludeModule(MAXYSS_WB_NAME) && $GLOBALS['APPLICATION']->GetGroupRight(MAXYSS_WB_NAME) >= "R") {
     if (($_REQUEST['save'] || $_REQUEST['apply']) && $GLOBALS['APPLICATION']->GetGroupRight(MAXYSS_WB_NAME) == "W") {
-        $option = array("ACTIVE_ORDER_ON"=>"active_order_on", "PERIOD_ORDER"=>"period_order", "COUNT_ORDER"=>"count_order", "VALUTA_ORDER"=>"valuta",  "PERSON_TYPE"=>"person_type", "DELIVERY_SERVICE"=>"delivery_service", "PAYSYSTEM"=>"paysystem", "USER_DEFAULTE"=>"user_defaulte", "NEW"=>"status_0", "CANCEL"=>"status_1", "CLIENT_RECEIVED"=>"status_2", "CLIENT_RETURN"=>"status_3", "SKLAD_WB"=>"status_4", "TRANSIT"=>"status_5", "RETURN_PRODUCT"=>"status_6", "CALLBACK_BX"=>"callback_bx", "STIKER_WIDTH"=>"STIKER_WIDTH");
+        $option = array("ACTIVE_ORDER_ON"=>"active_order_on", "PERIOD_ORDER"=>"period_order", "COUNT_ORDER"=>"count_order", "VALUTA_ORDER"=>"valuta",  "PERSON_TYPE"=>"person_type", "DELIVERY_SERVICE"=>"delivery_service", "PAYSYSTEM"=>"paysystem", "USER_DEFAULTE"=>"user_defaulte", "NEW"=>"status_0", "CANCEL"=>"status_1", "CLIENT_RECEIVED"=>"status_2", "CLIENT_RETURN"=>"status_3", "SKLAD_WB"=>"status_4", "TRANSIT"=>"status_5", "RETURN_PRODUCT"=>"status_6", "CALLBACK_BX"=>"callback_bx", "STIKER_WIDTH"=>"STIKER_WIDTH", "FLAG_SHIPMENT_UP"=>"FLAG_SHIPMENT_UP", "FLAG_CANCELLED_UP"=>"FLAG_CANCELLED_UP", "FLAG_PAYMENT_UP"=>"FLAG_PAYMENT_UP");
         CHelpMaxyssWB::saveOption($option);
 
         if($_REQUEST['SKLAD_WB_TRIGER']) {
@@ -229,7 +229,7 @@ if(Loader::includeModule('sale') && Loader::includeModule('iblock') && CModule::
                         $ID = CSaleOrderProps::Add($arFields);
                     }
 
-                    // тип доставки свойство
+                    // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
                     $arFields = array(
                         "PERSON_TYPE_ID" => $person_type_id,
@@ -398,10 +398,14 @@ if(Loader::includeModule('sale') && Loader::includeModule('iblock') && CModule::
     <div style="color: red"><?=GetMessage("WB_MAXYSS_NOT_RIGHT_EDIT_SETTINGS")?></div><br>
 <?}?>
     <form action="<?=MAXYSS_WB_NAME?>_order_wb_maxyss.php?lang=<?=LANGUAGE_ID?>" method="post">
-        <?$tabControl->Begin();   // табуляторы ?>
+        <?$tabControl->Begin();   // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ ?>
 
         <?foreach($arTabs as $key_cab => $arTab)
             {
+
+                $arFlagSipmentBitrixBD = $arSettings["FLAG_SHIPMENT_UP"][$arTab["CABINET"]];
+                $arFlagCancelledBitrixBD = $arSettings["FLAG_CANCELLED_UP"][$arTab["CABINET"]];
+                $arFlagPaymentBitrixBD = $arSettings["FLAG_PAYMENT_UP"][$arTab["CABINET"]];
 
             $tabControl->BeginNextTab();
             ?>
@@ -426,7 +430,7 @@ if(Loader::includeModule('sale') && Loader::includeModule('iblock') && CModule::
                     </td>
                 </tr>
                 <tr class="heading">
-                    <td colspan="2"><?=GetMessage('MAXYSS_WB_STIKRES_PARAM')?></td>
+                    <td colspan="2"><?=GetMessage('MAXYSS_WB_STIKERS_PARAM')?></td>
                 </tr>
                 <tr>
                     <td style="width: 50%;" class="adm-detail-content-cell-l"><?=GetMessage('MAXYSS_WB_STIKERS_WIDTH')?></td>
@@ -513,9 +517,9 @@ if(Loader::includeModule('sale') && Loader::includeModule('iblock') && CModule::
                         <table style="width: 100%">
                             <tbody>
                             <tr class="heading">
-                                <td colspan="3"><?=GetMessage('MAXYSS_WB_STATUS_OZON_HEAD')?></td>
+                                <td colspan="6"><?=GetMessage('MAXYSS_WB_STATUS_OZON_HEAD')?></td>
                             </tr>
-                            <!--соответствие статусов-->
+                            <!--пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ-->
                             <?
                             $db_osatatus = CSaleStatus::GetList( array("SORT"=>"ASC"),array(), false, false, array());
                             while ($osatatus = $db_osatatus->Fetch())
@@ -527,8 +531,11 @@ if(Loader::includeModule('sale') && Loader::includeModule('iblock') && CModule::
                             ?>
                             <tr style="font-weight: bold">
                                 <td style="width: 20%" class="adm-detail-content-cell-l"><?=GetMessage('MAXYSS_WB_STATUS_TITLE')?></td>
-                                <td  class="adm-detail-content-cell-center"><?=GetMessage('MAXYSS_WB_STATUS_BITRIX_TITLE')?></td>
-                                <td><?=GetMessage('MAXYSS_WB_STATUS_TRIGGER_TITLE')?><span data-hint="<?=GetMessage('MAXYSS_WB_STATUS_TRIGGER_TITLE_TIP')?>"></span></td>
+                                <td style="padding-left: 50px" class="adm-detail-content-cell-center"><?=GetMessage('MAXYSS_WB_STATUS_BITRIX_TITLE')?></td>
+                                <td style="text-align: center"><?=GetMessage('MAXYSS_WB_FLAG_CANCELED')?><span data-hint="<?=GetMessage('MAXYSS_WB_FLAG_CANCELED_TIP')?>"></span></td>
+                                <td style="text-align: center"><?=GetMessage('MAXYSS_WB_FLAG_SHIP')?><span data-hint="<?=GetMessage('MAXYSS_WB_FLAG_SHIP_TIP')?>"></span></td>
+                                <td style="text-align: center"><?=GetMessage('MAXYSS_WB_FLAG_PAYMENT')?><span data-hint="<?=GetMessage('MAXYSS_WB_FLAG_PAYMENT_TIP')?>"></span></td>
+                                <td style="text-align: center"><?=GetMessage('MAXYSS_WB_STATUS_TRIGGER_TITLE')?><span data-hint="<?=GetMessage('MAXYSS_WB_STATUS_TRIGGER_TITLE_TIP')?>"></span></td>
                             </tr>
                             <tr>
                                 <td class="adm-detail-content-cell-l">
@@ -540,6 +547,21 @@ if(Loader::includeModule('sale') && Loader::includeModule('iblock') && CModule::
                                             <option value="<?=$key?>" <?echo (($arSettings['NEW'][$arTab['CABINET']] == $key)? 'selected = "selected"' : '')?>><?=$type?></option>
                                         <?}?>
                                     </select>
+                                </td>
+                                <td></td>
+                                <td style="text-align: center" class="adm-detail-content-cell-r">
+                                    <input type="hidden" name="FLAG_SHIPMENT_UP[<?= $arTab["CABINET"] ?>][status_0]"
+                                           value="N">
+                                    <input type="checkbox" id="FLAG_SHIPMENT_UP_status_0_<?= $arTab["CABINET"] ?>"
+                                           name="FLAG_SHIPMENT_UP[<?= $arTab["CABINET"] ?>][status_0]"
+                                           value="Y" <? echo ($arFlagSipmentBitrixBD['status_0'] == 'Y') ? 'checked = "checked"' : '' ?>>
+                                </td>
+                                <td style="text-align: center" class="adm-detail-content-cell-r">
+                                    <input type="hidden" name="FLAG_PAYMENT_UP[<?= $arTab["CABINET"] ?>][status_0]"
+                                           value="N">
+                                    <input type="checkbox" id="FLAG_PAYMENT_UP_status_0_<?= $arTab["CABINET"] ?>"
+                                           name="FLAG_PAYMENT_UP[<?= $arTab["CABINET"] ?>][status_0]"
+                                           value="Y" <? echo ($arFlagPaymentBitrixBD['status_0'] == 'Y') ? 'checked = "checked"' : '' ?>>
                                 </td>
                                 <td class="adm-detail-content-cell-r"></td>
                             </tr>
@@ -557,9 +579,36 @@ if(Loader::includeModule('sale') && Loader::includeModule('iblock') && CModule::
                                         <?}?>
                                     </select>
                                 </td>
-                                <td class="adm-detail-content-cell-r">
+                                <td style="text-align: center" class="adm-detail-content-cell-r">
+                                    <input type="hidden" name="FLAG_CANCELLED_UP[<?= $arTab["CABINET"] ?>][status_1]" value="N">
+                                    <input type="checkbox"
+                                           onchange="control_status_cancel_checkbox($(this));"
+                                           id="FLAG_CANCELLED_UP_status_1_<?= $arTab["CABINET"] ?>"
+                                           name="FLAG_CANCELLED_UP[<?= $arTab["CABINET"] ?>][status_1]"
+                                           value="Y" <? echo ($arFlagCancelledBitrixBD['status_1'] == 'Y') ? 'checked = "checked"' : '' ?>
+                                        <?echo ($triggers_options['CANCEL'])? 'disabled="disabled" ': '';?>>
+                                </td>
+                                <td style="text-align: center" class="adm-detail-content-cell-r">
+                                    <input type="hidden" name="FLAG_SHIPMENT_UP[<?= $arTab["CABINET"] ?>][status_1]"
+                                           value="N">
+                                    <input type="checkbox" id="FLAG_SHIPMENT_UP_status_1_<?= $arTab["CABINET"] ?>"
+                                           name="FLAG_SHIPMENT_UP[<?= $arTab["CABINET"] ?>][status_1]"
+                                           value="Y" <? echo ($arFlagSipmentBitrixBD['status_1'] == 'Y') ? 'checked = "checked"' : '' ?>
+                                        <?echo ($triggers_options['CANCEL'])? 'disabled="disabled" ': '';?>
+                                        <?echo ($arFlagCancelledBitrixBD['status_1'] == 'Y') ? 'disabled="disabled" ' : '' ?>>
+                                </td>
+                                <td style="text-align: center" class="adm-detail-content-cell-r">
+                                    <input type="hidden" name="FLAG_PAYMENT_UP[<?= $arTab["CABINET"] ?>][status_1]"
+                                           value="N">
+                                    <input type="checkbox" id="FLAG_PAYMENT_UP_status_1_<?= $arTab["CABINET"] ?>"
+                                           name="FLAG_PAYMENT_UP[<?= $arTab["CABINET"] ?>][status_1]"
+                                           value="Y" <? echo ($arFlagPaymentBitrixBD['status_1'] == 'Y') ? 'checked = "checked"' : '' ?>
+                                           <?echo ($triggers_options['CANCEL'])? 'disabled="disabled" ': '';?>
+                                        <?echo ($arFlagCancelledBitrixBD['status_1'] == 'Y') ? 'disabled="disabled" ' : '' ?>>
+                                </td>
+                                <td style="text-align: center">
                                     <input type="hidden" value="N" name="CANCEL_TRIGER[<?=$arTab['CABINET']?>]">
-                                    <input type="checkbox" value="Y" <?echo ($triggers_options['CANCEL'])? 'checked': '';?> name="CANCEL_TRIGER[<?=$arTab['CABINET']?>]"><span data-hint="<?=GetMessage('MAXYSS_WB_TRIGGER_CANCEL_TIP')?>"></span>
+                                    <input type="checkbox" id="CANCEL_TRIGER_<?= $arTab["CABINET"] ?>" onchange="control_status_checkbox($(this));" value="Y" <?echo ($triggers_options['CANCEL'])? 'checked': '';?> name="CANCEL_TRIGER[<?=$arTab['CABINET']?>]"><span data-hint="<?=GetMessage('MAXYSS_WB_TRIGGER_CANCEL_TIP')?>"></span>
                                 </td>
                             </tr>
 
@@ -576,9 +625,36 @@ if(Loader::includeModule('sale') && Loader::includeModule('iblock') && CModule::
                                         <?}?>
                                     </select>
                                 </td>
-                                <td class="adm-detail-content-cell-r">
+                                <td style="text-align: center" class="adm-detail-content-cell-r">
+                                    <input type="hidden" name="FLAG_CANCELLED_UP[<?= $arTab["CABINET"] ?>][status_2]" value="N">
+                                    <input type="checkbox"
+                                           onchange="control_status_cancel_checkbox($(this));"
+                                           id="FLAG_CANCELLED_UP_status_2_<?= $arTab["CABINET"] ?>"
+                                           name="FLAG_CANCELLED_UP[<?= $arTab["CABINET"] ?>][status_2]"
+                                           value="Y" <? echo ($arFlagCancelledBitrixBD['status_2'] == 'Y') ? 'checked = "checked"' : '' ?>
+                                        <?echo ($triggers_options['CLIENT_RECEIVED'])? 'disabled="disabled"': '';?>>
+                                </td>
+                                <td style="text-align: center" class="adm-detail-content-cell-r">
+                                    <input type="hidden" name="FLAG_SHIPMENT_UP[<?= $arTab["CABINET"] ?>][status_2]"
+                                           value="N">
+                                    <input type="checkbox" id="FLAG_SHIPMENT_UP_status_2_<?= $arTab["CABINET"] ?>"
+                                           name="FLAG_SHIPMENT_UP[<?= $arTab["CABINET"] ?>][status_2]"
+                                           value="Y" <? echo ($arFlagSipmentBitrixBD['status_2'] == 'Y') ? 'checked = "checked"' : '' ?>
+                                        <?echo ($triggers_options['CLIENT_RECEIVED'])? 'disabled="disabled"': '';?>
+                                        <?echo ($arFlagCancelledBitrixBD['status_2'] == 'Y') ? 'disabled="disabled" ' : '' ?>>
+                                </td>
+                                <td style="text-align: center" class="adm-detail-content-cell-r">
+                                    <input type="hidden" name="FLAG_PAYMENT_UP[<?= $arTab["CABINET"] ?>][status_2]"
+                                           value="N">
+                                    <input type="checkbox" id="FLAG_PAYMENT_UP_status_2_<?= $arTab["CABINET"] ?>"
+                                           name="FLAG_PAYMENT_UP[<?= $arTab["CABINET"] ?>][status_2]"
+                                           value="Y" <? echo ($arFlagPaymentBitrixBD['status_2'] == 'Y') ? 'checked = "checked"' : '' ?>
+                                        <?echo ($triggers_options['CLIENT_RECEIVED'])? 'disabled="disabled"': '';?>
+                                        <?echo ($arFlagCancelledBitrixBD['status_2'] == 'Y') ? 'disabled="disabled" ' : '' ?>>
+                                </td>
+                                <td style="text-align: center">
                                     <input type="hidden" value="N" name="CLIENT_RECEIVED_TRIGER[<?=$arTab['CABINET']?>]">
-                                    <input type="checkbox" value="Y" <?echo ($triggers_options['CLIENT_RECEIVED'])? 'checked': '';?> name="CLIENT_RECEIVED_TRIGER[<?=$arTab['CABINET']?>]"><span data-hint="<?=GetMessage('MAXYSS_WB_TRIGGER_CLIENT_RECEIVED_TIP')?>">
+                                    <input type="checkbox" id="CLIENT_RECEIVED_TRIGER_<?= $arTab["CABINET"] ?>" onchange="control_status_checkbox($(this));" value="Y" <?echo ($triggers_options['CLIENT_RECEIVED'])? 'checked': '';?> name="CLIENT_RECEIVED_TRIGER[<?=$arTab['CABINET']?>]"><span data-hint="<?=GetMessage('MAXYSS_WB_TRIGGER_CLIENT_RECEIVED_TIP')?>">
                                 </td>
                             </tr>
 
@@ -595,6 +671,30 @@ if(Loader::includeModule('sale') && Loader::includeModule('iblock') && CModule::
                                         <?}?>
                                     </select>
                                 </td>
+                                <td style="text-align: center" class="adm-detail-content-cell-r">
+                                    <input type="hidden" name="FLAG_CANCELLED_UP[<?= $arTab["CABINET"] ?>][status_3]" value="N">
+                                    <input type="checkbox"
+                                           onchange="control_status_cancel_checkbox($(this));"
+                                           id="FLAG_CANCELLED_UP_status_3_<?= $arTab["CABINET"] ?>"
+                                           name="FLAG_CANCELLED_UP[<?= $arTab["CABINET"] ?>][status_3]"
+                                           value="Y" <? echo ($arFlagCancelledBitrixBD['status_3'] == 'Y') ? 'checked = "checked"' : '' ?>>
+                                </td>
+                                <td style="text-align: center" class="adm-detail-content-cell-r">
+                                    <input type="hidden" name="FLAG_SHIPMENT_UP[<?= $arTab["CABINET"] ?>][status_3]"
+                                           value="N">
+                                    <input type="checkbox" id="FLAG_SHIPMENT_UP_status_3_<?= $arTab["CABINET"] ?>"
+                                           name="FLAG_SHIPMENT_UP[<?= $arTab["CABINET"] ?>][status_3]"
+                                           value="Y" <? echo ($arFlagSipmentBitrixBD['status_3'] == 'Y') ? 'checked = "checked"' : '' ?>
+                                        <?echo ($arFlagCancelledBitrixBD['status_3'] == 'Y') ? 'disabled="disabled" ' : '' ?>>
+                                </td>
+                                <td style="text-align: center" class="adm-detail-content-cell-r">
+                                    <input type="hidden" name="FLAG_PAYMENT_UP[<?= $arTab["CABINET"] ?>][status_3]"
+                                           value="N">
+                                    <input type="checkbox" id="FLAG_PAYMENT_UP_status_3_<?= $arTab["CABINET"] ?>"
+                                           name="FLAG_PAYMENT_UP[<?= $arTab["CABINET"] ?>][status_3]"
+                                           value="Y" <? echo ($arFlagPaymentBitrixBD['status_3'] == 'Y') ? 'checked = "checked"' : '' ?>
+                                        <?echo ($arFlagCancelledBitrixBD['status_3'] == 'Y') ? 'disabled="disabled" ' : '' ?>>
+                                </td>
                                 <td class="adm-detail-content-cell-r"></td>
                             </tr>
                             <tr>
@@ -609,10 +709,33 @@ if(Loader::includeModule('sale') && Loader::includeModule('iblock') && CModule::
                                         <?}?>
                                     </select>
                                 </td>
-
+                                <td style="text-align: center" class="adm-detail-content-cell-r">
+                                    <input type="hidden" name="FLAG_CANCELLED_UP[<?= $arTab["CABINET"] ?>][status_4]" value="N">
+                                    <input type="checkbox"
+                                           onchange="control_status_cancel_checkbox($(this));"
+                                           id="FLAG_CANCELLED_UP_status_4_<?= $arTab["CABINET"] ?>"
+                                           name="FLAG_CANCELLED_UP[<?= $arTab["CABINET"] ?>][status_4]"
+                                           value="Y" <? echo ($arFlagCancelledBitrixBD['status_4'] == 'Y') ? 'checked = "checked"' : '' ?>>
+                                </td>
+                                <td style="text-align: center" class="adm-detail-content-cell-r">
+                                    <input type="hidden" name="FLAG_SHIPMENT_UP[<?= $arTab["CABINET"] ?>][status_4]"
+                                           value="N">
+                                    <input type="checkbox" id="FLAG_SHIPMENT_UP_status_4_<?= $arTab["CABINET"] ?>"
+                                           name="FLAG_SHIPMENT_UP[<?= $arTab["CABINET"] ?>][status_4]"
+                                           value="Y" <? echo ($arFlagSipmentBitrixBD['status_4'] == 'Y') ? 'checked = "checked"' : '' ?>
+                                        <?echo ($arFlagCancelledBitrixBD['status_4'] == 'Y') ? 'disabled="disabled" ' : '' ?>>
+                                </td>
+                                <td style="text-align: center" class="adm-detail-content-cell-r">
+                                    <input type="hidden" name="FLAG_PAYMENT_UP[<?= $arTab["CABINET"] ?>][status_4]"
+                                           value="N">
+                                    <input type="checkbox" id="FLAG_PAYMENT_UP_status_4_<?= $arTab["CABINET"] ?>"
+                                           name="FLAG_PAYMENT_UP[<?= $arTab["CABINET"] ?>][status_4]"
+                                           value="Y" <? echo ($arFlagPaymentBitrixBD['status_4'] == 'Y') ? 'checked = "checked"' : '' ?>
+                                        <?echo ($arFlagCancelledBitrixBD['status_4'] == 'Y') ? 'disabled="disabled" ' : '' ?>>
+                                </td>
                                 <td class="adm-detail-content-cell-r">
                                     <input type="hidden" value="N" name="SKLAD_WB_TRIGER[<?=$arTab['CABINET']?>]">
-                                    <?/* устарело   ?>
+                                    <?/* пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ   ?>
                                     <input type="checkbox" value="Y" <?echo ($triggers_options['SKLAD_WB'])? 'checked': '';?> name="SKLAD_WB_TRIGER[<?=$arTab['CABINET']?>]"><span data-hint="<?=GetMessage('MAXYSS_WB_TRIGGER_SKLAD_WB_TIP')?>"><?*/?>
                                 </td>
                             </tr>
@@ -629,6 +752,30 @@ if(Loader::includeModule('sale') && Loader::includeModule('iblock') && CModule::
                                         <?}?>
                                     </select>
                                 </td>
+                                <td style="text-align: center" class="adm-detail-content-cell-r">
+                                    <input type="hidden" name="FLAG_CANCELLED_UP[<?= $arTab["CABINET"] ?>][status_5]" value="N">
+                                    <input type="checkbox"
+                                           onchange="control_status_cancel_checkbox($(this));"
+                                           id="FLAG_CANCELLED_UP_status_5_<?= $arTab["CABINET"] ?>"
+                                           name="FLAG_CANCELLED_UP[<?= $arTab["CABINET"] ?>][status_5]"
+                                           value="Y" <? echo ($arFlagCancelledBitrixBD['status_5'] == 'Y') ? 'checked = "checked"' : '' ?>>
+                                </td>
+                                <td style="text-align: center" class="adm-detail-content-cell-r">
+                                    <input type="hidden" name="FLAG_SHIPMENT_UP[<?= $arTab["CABINET"] ?>][status_5]"
+                                           value="N">
+                                    <input type="checkbox" id="FLAG_SHIPMENT_UP_status_5_<?= $arTab["CABINET"] ?>"
+                                           name="FLAG_SHIPMENT_UP[<?= $arTab["CABINET"] ?>][status_5]"
+                                           value="Y" <? echo ($arFlagSipmentBitrixBD['status_5'] == 'Y') ? 'checked = "checked"' : '' ?>
+                                        <?echo ($arFlagCancelledBitrixBD['status_5'] == 'Y') ? 'disabled="disabled" ' : '' ?>>
+                                </td>
+                                <td style="text-align: center" class="adm-detail-content-cell-r">
+                                    <input type="hidden" name="FLAG_PAYMENT_UP[<?= $arTab["CABINET"] ?>][status_5]"
+                                           value="N">
+                                    <input type="checkbox" id="FLAG_PAYMENT_UP_status_5_<?= $arTab["CABINET"] ?>"
+                                           name="FLAG_PAYMENT_UP[<?= $arTab["CABINET"] ?>][status_5]"
+                                           value="Y" <? echo ($arFlagPaymentBitrixBD['status_5'] == 'Y') ? 'checked = "checked"' : '' ?>
+                                        <?echo ($arFlagCancelledBitrixBD['status_5'] == 'Y') ? 'disabled="disabled" ' : '' ?>>
+                                </td>
                                 <td class="adm-detail-content-cell-r"></td>
                             </tr>
 
@@ -643,7 +790,31 @@ if(Loader::includeModule('sale') && Loader::includeModule('iblock') && CModule::
                                         <?foreach ($arStatus as $key => $type){?>
                                             <option value="<?=$key?>" <?echo ($arSettings['RETURN_PRODUCT'][$arTab['CABINET']] == $key)? 'selected = "selected"' : ''?>><?=$type?></option>
                                         <?}?>
-                                    </select><br><br>
+                                    </select>
+                                </td>
+                                <td style="text-align: center" class="adm-detail-content-cell-r">
+                                    <input type="hidden" name="FLAG_CANCELLED_UP[<?= $arTab["CABINET"] ?>][status_6]" value="N">
+                                    <input type="checkbox"
+                                           onchange="control_status_cancel_checkbox($(this));"
+                                           id="FLAG_CANCELLED_UP_status_6_<?= $arTab["CABINET"] ?>"
+                                           name="FLAG_CANCELLED_UP[<?= $arTab["CABINET"] ?>][status_6]"
+                                           value="Y" <? echo ($arFlagCancelledBitrixBD['status_6'] == 'Y') ? 'checked = "checked"' : '' ?>>
+                                </td>
+                                <td style="text-align: center" class="adm-detail-content-cell-r">
+                                    <input type="hidden" name="FLAG_SHIPMENT_UP[<?= $arTab["CABINET"] ?>][status_6]"
+                                           value="N">
+                                    <input type="checkbox" id="FLAG_SHIPMENT_UP_status_6_<?= $arTab["CABINET"] ?>"
+                                           name="FLAG_SHIPMENT_UP[<?= $arTab["CABINET"] ?>][status_6]"
+                                           value="Y" <? echo ($arFlagSipmentBitrixBD['status_6'] == 'Y') ? 'checked = "checked"' : '' ?>
+                                        <?echo ($arFlagCancelledBitrixBD['status_6'] == 'Y') ? 'disabled="disabled" ' : '' ?>>
+                                </td>
+                                <td style="text-align: center" class="adm-detail-content-cell-r">
+                                    <input type="hidden" name="FLAG_PAYMENT_UP[<?= $arTab["CABINET"] ?>][status_6]"
+                                           value="N">
+                                    <input type="checkbox" id="FLAG_PAYMENT_UP_status_6_<?= $arTab["CABINET"] ?>"
+                                           name="FLAG_PAYMENT_UP[<?= $arTab["CABINET"] ?>][status_6]"
+                                           value="Y" <? echo ($arFlagPaymentBitrixBD['status_6'] == 'Y') ? 'checked = "checked"' : '' ?>
+                                        <?echo ($arFlagCancelledBitrixBD['status_6'] == 'Y') ? 'disabled="disabled" ' : '' ?>>
                                 </td>
                                 <td class="adm-detail-content-cell-r"></td>
                             </tr>
@@ -652,7 +823,7 @@ if(Loader::includeModule('sale') && Loader::includeModule('iblock') && CModule::
                     </td>
                 </tr>
 
-                <!--соответствие статусов-->
+                <!--пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ-->
                 <tr>
                     <td colspan="2">
                         <table style="width: 100%">
@@ -678,7 +849,7 @@ if(Loader::includeModule('sale') && Loader::includeModule('iblock') && CModule::
                 </tr>
             <?}?>
             <?$tabControl->Buttons(array(
-                "back_url"=>MAXYSS_MODULE_NAME."_ozon_maxyss_general.php?lang=".LANGUAGE_ID,
+                "back_url"=>MAXYSS_WB_NAME."_order_wb_maxyss.php?lang=".LANGUAGE_ID,
 
             ));?>
 
@@ -690,6 +861,33 @@ if(Loader::includeModule('sale') && Loader::includeModule('iblock') && CModule::
 <!--            </div>-->
 <!--        </div>-->
     </form>
+    <script>
+        function control_status_checkbox(t){
+            let input_chk = $(t);
+            let input_chk_parent = input_chk.parent().parent();
+            let all_chk = input_chk_parent.find("input[type=checkbox]");
+            for( let i=0; i < (all_chk.length - 1); i++ ){
+                if(input_chk.prop('checked') === true)
+                    $(all_chk[i]).prop('checked', false).prop('disabled', true);
+                else
+                    $(all_chk[i]).prop('disabled', false);
+
+            }
+        }
+        function control_status_cancel_checkbox(t){
+            let input_chk = $(t);
+            let input_chk_parent = input_chk.parent().parent();
+            let all_chk = input_chk_parent.find("input[type=checkbox]");
+            let count_for = all_chk.length - 1;
+            if (count_for == 2) count_for = 3;
+                for( let i=1; i < count_for; i++ ){
+                if(input_chk.prop('checked') === true)
+                    $(all_chk[i]).prop('checked', false).prop('disabled', true);
+                else
+                    $(all_chk[i]).prop('disabled', false);
+            }
+        }
+    </script>
 <?}else
     die();
 require($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/main/include/epilog_admin.php');?>

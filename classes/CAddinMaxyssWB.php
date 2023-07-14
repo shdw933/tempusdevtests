@@ -254,13 +254,46 @@ class CAddinMaxyssWB{
                     else
                     {
                         if ($property[$sinc_set[$char['name']][$iblock_id]]['PROPERTY_TYPE'] == 'L' || ($property[$sinc_set[$char['name']][$iblock_id]]['PROPERTY_TYPE'] == 'S' && empty($property[$sinc_set[$char['name']][$iblock_id]]['USER_TYPE_SETTINGS'])))
-                        { // строка или число
+                        { // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
                             if($char['maxCount'] > 1)
                                 $val[] = ($char['charcType'] == 1)? strval($property[$sinc_set[$char['name']][$iblock_id]]['VALUE']) : floatval($property[$sinc_set[$char['name']][$iblock_id]]['VALUE']);
                             else
                                 $val = ($char['charcType'] == 1)? strval($property[$sinc_set[$char['name']][$iblock_id]]['VALUE']) : floatval($property[$sinc_set[$char['name']][$iblock_id]]['VALUE']);
 
+                        }
+                        elseif ($property[$sinc_set[$char['name']][$iblock_id]]['PROPERTY_TYPE'] == 'E'){
+                            if($char['maxCount'] > 1) {
+                                if(is_array($property[$sinc_set[$char['name']][$iblock_id]]['VALUE'])){
+                                    foreach ($property[$sinc_set[$char['name']][$iblock_id]]['VALUE'] as $val_el_iblock){
+                                        if($val_el_iblock > 0) {
+                                            $bd_el_iblock = CIBlockElement::GetByID($val_el_iblock);
+                                            if ($ar_el_iblock = $bd_el_iblock->GetNext())
+                                                $val[] = ($char['charcType'] == 1) ? strval($ar_el_iblock['NAME']) : floatval($ar_el_iblock['NAME']);
+                                        }
+                                    }
+                                }
+                                elseif($property[$sinc_set[$char['name']][$iblock_id]]['VALUE'] > 0)
+                                {
+                                    $bd_el_iblock = CIBlockElement::GetByID($property[$sinc_set[$char['name']][$iblock_id]]['VALUE']);
+                                    if ($ar_el_iblock = $bd_el_iblock->GetNext())
+                                        $val[] = ($char['charcType'] == 1) ? strval($ar_el_iblock['NAME']) : floatval($ar_el_iblock['NAME']);
+                                }
+                            }
+                            else
+                            {
+                                if(is_array($property[$sinc_set[$char['name']][$iblock_id]]['VALUE']) && $property[$sinc_set[$char['name']][$iblock_id]]['VALUE'][0] > 0){
+                                    $bd_el_iblock = CIBlockElement::GetByID($property[$sinc_set[$char['name']][$iblock_id]]['VALUE'][0]);
+                                    if ($ar_el_iblock = $bd_el_iblock->GetNext())
+                                        $val = ($char['charcType'] == 1)? strval($ar_el_iblock['NAME']) : floatval($ar_el_iblock['NAME']);
 
+                                }
+                                elseif($property[$sinc_set[$char['name']][$iblock_id]]['VALUE'] > 0)
+                                {
+                                    $bd_el_iblock = CIBlockElement::GetByID($property[$sinc_set[$char['name']][$iblock_id]]['VALUE']);
+                                    if ($ar_el_iblock = $bd_el_iblock->GetNext())
+                                        $val = ($char['charcType'] == 1)? strval($ar_el_iblock['NAME']) : floatval($ar_el_iblock['NAME']);
+                                }
+                            }
                         }
                         elseif ($property[$sinc_set[$char['name']][$iblock_id]]['PROPERTY_TYPE'] == 'S' && !empty($property[$sinc_set[$char['name']][$iblock_id]]['USER_TYPE_SETTINGS']))
                         {
@@ -854,7 +887,7 @@ class CAddinMaxyssWB{
                 return $str_result;
             }
         }
-    } 
+    }
     public static function KgtSize($arTovar){
         $kgt = false;
         if($arTovar['WEIGHT']>25000)

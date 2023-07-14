@@ -81,14 +81,13 @@ if($_REQUEST['action'] == 'upload_card'){
                 $item_info['item']["characteristics"][GetMessage('MAXYSS_WB_CARD_HEIGHT_UPAC')] = array(GetMessage('MAXYSS_WB_CARD_HEIGHT_UPAC') => ceil($arTovar['HEIGHT'] / 10));
                 $item_info['item']["characteristics"][GetMessage('MAXYSS_WB_CARD_HEIGHT_UPAC_MM')] = array(GetMessage('MAXYSS_WB_CARD_HEIGHT_UPAC_MM') => ceil($arTovar['HEIGHT'] / 10));
             }
-
             if ($arTovar['TYPE'] == 3) {
                 $update_noms = false;
                 $arInfoOff = CCatalogSKU::GetInfoByProductIBlock($IBLOCK_ID);
 
                 if (is_array($arInfoOff)) {
 
-                    // цвет, размер
+                    // пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ
 
                     if (file_exists($_SERVER['DOCUMENT_ROOT'] . "/bitrix/modules/" . MAXYSS_WB_NAME . "/dependencies.txt")) {
                         $dependencies = CUtil::JsObjectToPhp(file_get_contents($_SERVER['DOCUMENT_ROOT'] . "/bitrix/modules/" . MAXYSS_WB_NAME . "/dependencies.txt"));
@@ -162,15 +161,16 @@ if($_REQUEST['action'] == 'upload_card'){
                     $arImgForUpload = array();
 
                     foreach ($arOffers as $key => $color) {
-                        /* if ($arSettings['TP_AS_PRODUCT'] == 'Y') { // тп как товар
-                             $item_list = array();
+                        if ($arSettings['TP_AS_PRODUCT'] == 'Y') { // пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
                              foreach ($color as $size) {
-                                 $item_tp = array();
-                                 $item_tp = $item_info['item']['card'];
-                                 $item_tp['supplierID'] = $item_info['item']['supplierID'];
-                                 $item_tp['supplierVendorCode'] = ($arSettings['ARTICLE'] == '') ? $size['FIELD']['ID'] : $size["PROP"][$arSettings['ARTICLE']]["VALUE"];
-                                 $item_tp['nomenclatures'][0]['vendorCode'] = $item_tp['supplierVendorCode'];
+                                $nom = array(
+                                    "vendorCode" => ($arSettings['ARTICLE'] == '') ? $size['FIELD']['ID'] : $size["PROP"][$arSettings['ARTICLE']]["VALUE"],
+                                    "characteristics" => $item_info['item']['characteristics'],
+                                    "sizes" => $item_info['item']['sizes'],
+                                );
 
+                                $nom['sizes'][0]['price'] = CMaxyssWb::get_price($arSettings['PRICE_TYPE'], $arSettings['PRICE_PROP'], $arSettings['PRICE_TYPE_PROP'], $arSettings['PRICE_TYPE_NO_DISCOUNT'], $size['FIELD']['ID'], $lid, $arSettings["PRICE_TYPE_FORMULA"], $arSettings["PRICE_TYPE_FORMULA_ACTION"]
+                                );
 
                                  $description = '';
                                  if ($arSettings['DESCRIPTION'] == 'DETAIL_TEXT' || $arSettings['DESCRIPTION'] == 'PREVIEW_TEXT')
@@ -184,30 +184,31 @@ if($_REQUEST['action'] == 'upload_card'){
                                  elseif ($arSettings['NAME_PRODUCT'] != '')
                                      $name = (is_array($size["PROP"][$arSettings['NAME_PRODUCT']]["~VALUE"])) ? $size["PROP"][$arSettings['NAME_PRODUCT']]["~VALUE"]["TEXT"] : $size["PROP"][$arSettings['NAME_PRODUCT']]["~VALUE"];
 
-                                 foreach ($item_tp['addin'] as $key_a => &$a) {
-                                     switch ($a['type']){
-                                         case GetMessage('WB_MAXYSS_DESCRIPTION'):
-                                             if($description!='') {
-                                                 $a['params'] = array(
-                                                     array(
-                                                         "value" => TruncateText(str_replace(array('&nbsp;', '&quot'), ' ', htmlentities(HTMLToTxt($description, $arSettings['SERVER_NAME']))), 997)
-                                                     )
-                                                 );
+                                if($description != '')
+                                    $addin_card[GetMessage('WB_MAXYSS_DESCRIPTION')] = array(GetMessage('WB_MAXYSS_DESCRIPTION')=> TruncateText(str_replace('&nbsp;', ' ', htmlentities(HTMLToTxt($description, $arSettings['SERVER_NAME']))), 997) );
+                                if($name != '')
+                                    $addin_card[GetMessage('MAXYSS_WB_NAME_NAME')] = array( GetMessage('MAXYSS_WB_NAME_NAME')=>  TruncateText($name, 57));
+
+
+                                $arTovarOff = CMaxyssWb::elemAsProduct($size['FIELD']['ID'], $arSettings);
+                                if(!empty($char_all['data'])) {
+                                    $nom['characteristics'] = CAddinMaxyssWB::GetSyncAddin($nom['characteristics'], $sinc_set, $size['FIELD']['IBLOCK_ID'], $char_all['data'], $size['PROP']);
+                                }
+                                if($arTovarOff['WEIGHT'] > 0 && !isset( $nom["characteristics"][GetMessage('MAXYSS_WB_CARD_WEIGHT_UPAC')])){
+                                    $nom["characteristics"][GetMessage('MAXYSS_WB_CARD_WEIGHT_UPAC')] = array(GetMessage('MAXYSS_WB_CARD_WEIGHT_UPAC')=>intval($arTovarOff['WEIGHT']));
                                              }
-                                             break;
-                                         case GetMessage('MAXYSS_WB_NAME_NAME'):
-                                             if($name!='') {
-                                                 $a['params'] = array(
-                                                     array(
-                                                         "value" => TruncateText($name, 97)
-                                                     )
-                                                 );
+                                if($arTovarOff['WEIGHT'] > 0 && !isset($nom["characteristics"][GetMessage('MAXYSS_WB_CARD_WEIGHT_UPAC_KG')])){
+                                    $nom["characteristics"][GetMessage('MAXYSS_WB_CARD_WEIGHT_UPAC_KG')] = array(GetMessage('MAXYSS_WB_CARD_WEIGHT_UPAC_KG')=>floatval($arTovarOff['WEIGHT']/1000));
                                              }
-                                             break;
+                                if($arTovarOff['WIDTH'] > 0 && !isset($nom["characteristics"][GetMessage('MAXYSS_WB_CARD_WIDTH_UPAC')])){
+                                    $nom["characteristics"][GetMessage('MAXYSS_WB_CARD_WIDTH_UPAC')] = array(GetMessage('MAXYSS_WB_CARD_WIDTH_UPAC')=>$arTovarOff['WIDTH']/10);
                                      }
+                                if($arTovarOff['LENGTH'] > 0 && !isset($nom["characteristics"][GetMessage('MAXYSS_WB_CARD_LENGTH_UPAC')])){
+                                    $nom["characteristics"][GetMessage('MAXYSS_WB_CARD_LENGTH_UPAC')] = array(GetMessage('MAXYSS_WB_CARD_LENGTH_UPAC')=>$arTovarOff['LENGTH']/10);
                                  }
-
-
+                                if($arTovarOff['HEIGHT'] > 0 && !isset($nom["characteristics"][GetMessage('MAXYSS_WB_CARD_HEIGHT_UPAC')])){
+                                    $nom["characteristics"][GetMessage('MAXYSS_WB_CARD_HEIGHT_UPAC')] = array(GetMessage('MAXYSS_WB_CARD_HEIGHT_UPAC')=>$arTovarOff['HEIGHT']/10);
+                                }
 
 
                                  $img = array();
@@ -222,81 +223,50 @@ if($_REQUEST['action'] == 'upload_card'){
                                  }
                                  $img = array_merge($img, $item_info['img']);
 
-                                 if (strlen($size['tech-sizes']) > 0) {
-                                     $item_tp['nomenclatures'][0]['variations'][0]['addin'][] = array(
-                                         "type" => GetMessage('WB_MAXYSS_SIZE_WB'),
-                                         "params" => array(
-                                             array(
-                                                 "value" => strval($size['tech-sizes'])
-                                             )
-                                         )
-                                     );
-                                 }
 
-                                 if (strlen($size['wbsizes']) > 0) {
-                                     $item_tp['nomenclatures'][0]['variations'][0]['addin'][] = array(
-                                         "type" => GetMessage('WB_MAXYSS_ROS_SIZE'),
-                                         "params" => array(
-                                             array(
-                                                 "value" => $size['wbsizes']
-                                             )
-                                         )
-                                     );
-                                 }
-
-                                 $item_tp['nomenclatures'][0]['variations'][0]['addin'][] = array(
-                                     "type" => GetMessage("WB_MAXYSS_PRICE"),
-                                     "params" => array(
-                                         array(
-                                             "count" => CMaxyssWb::get_price($arSettings['PRICE_TYPE'], $arSettings['PRICE_PROP'], $arSettings['PRICE_TYPE_PROP'], $arSettings['PRICE_TYPE_NO_DISCOUNT'], $size['FIELD']['ID'], $lid, $arSettings["PRICE_TYPE_FORMULA"], $arSettings["PRICE_TYPE_FORMULA_ACTION"]),
-                                             "units" => GetMessage('WB_MAXYSS_RUB'),
-                                         )
-                                     )
-                                 );
-
-
-                                 if (!empty($barcode_gen['result']['barcodes']) && $size["PROP"][$arSettings['SHKOD']]["VALUE"] == '') {
-                                     $barcode = array_shift($barcode_gen['result']['barcodes']);
+                                if (!empty($barcode_gen['data']) && $size["PROP"][$arSettings['SHKOD']]["VALUE"] == '') {
+                                    $barcode = array_shift($barcode_gen['data']);
                                      CIBlockElement::SetPropertyValuesEx($size['FIELD']['ID'], false, array(
                                          $arSettings['SHKOD'] => $barcode,
                                      ));
                                  } else $barcode = $size["PROP"][$arSettings['SHKOD']]["VALUE"];
 
-                                 $item_tp['nomenclatures'][0]['variations'][0]["barcode"] = $barcode;
-                                 $item_tp['nomenclatures'][0]['variations'][0]["barcodes"] = array($barcode);
+                                $nom['sizes'][0]['skus'] = array($barcode);
+                                if(is_array($size['PROP']['PROP_MAXYSS_CHRTID_CREATED_WB']['DESCRIPTION']))
+                                    $key_cabinet_prop = array_search($cabinet, $size['PROP']['PROP_MAXYSS_CHRTID_CREATED_WB']['DESCRIPTION']);
+
+                                if($key_cabinet_prop === false && is_array($size['PROP']['PROP_MAXYSS_CHRTID_CREATED_WB']['DESCRIPTION']))
+                                    $key_cabinet_prop = array_search('', $size['PROP']['PROP_MAXYSS_CHRTID_CREATED_WB']['DESCRIPTION']);
 
                                  $img = array_unique($img);
 
-                                 $arImgIds = array();
-                                 $arImgIds = CMaxyssWb::uploadPicture($img,  $arSettings['UUID'], $arSettings['AUTHORIZATION']);
-                                 if (!empty($arImgIds))
-                                     $item_tp['nomenclatures'][0]['addin'][] = array('type' => GetMessage("WB_MAXYSS_PHOTO"), 'params' => $arImgIds);
+                                if(!empty($img))
+                                    $arImgForUpload[] = array(
+                                        'img' => $img,
+                                        'vendorCode'=>$nom['vendorCode'],
+                                        'auth'=>$arSettings["AUTHORIZATION"],
+                                    );
 
 
-                                 if($size["PROP"]['PROP_MAXYSS_CARDID_WB']['VALUE'] > 0){
-                                     $item_tp['imtId'] = intval($size["PROP"]['PROP_MAXYSS_CARDID_WB']['VALUE']);
+                                if ($key_cabinet_prop !== false) {
+                                    if(
+                                        intval($size['PROP']['PROP_MAXYSS_CHRTID_CREATED_WB']['VALUE'][$key_cabinet_prop]) >0 &&
+                                        intval($size['PROP']['PROP_MAXYSS_NMID_CREATED_WB']['VALUE'][$key_cabinet_prop]) >0 &&
+                                        intval($size['PROP']['PROP_MAXYSS_CARDID_WB']['VALUE'][$key_cabinet_prop]) > 0
+                                    ) {
+                                        $nom['sizes'][0]['chrtID'] = intval($size['PROP']['PROP_MAXYSS_CHRTID_CREATED_WB']['VALUE'][$key_cabinet_prop]);
+                                        $nom['nmID'] = intval($size['PROP']['PROP_MAXYSS_NMID_CREATED_WB']['VALUE'][$key_cabinet_prop]);
+                                        $nom['imtID'] = intval($size['PROP']['PROP_MAXYSS_CARDID_WB']['VALUE'][$key_cabinet_prop]);
+                                        $update_noms = true;
                                  }
-                                 if($size["PROP"]['PROP_MAXYSS_NMID_CREATED_WB']['VALUE'] > 0 && $size["PROP"]['PROP_MAXYSS_CHRTID_CREATED_WB']['VALUE'] > 0){
-                                     $item_tp['nomenclatures'][0]['nmId'] = intval($size["PROP"]['PROP_MAXYSS_NMID_CREATED_WB']['VALUE']);
-                                     $item_tp['nomenclatures'][0]['variations'][0]['chrtId'] = intval($size["PROP"]['PROP_MAXYSS_CHRTID_CREATED_WB']['VALUE']);
                                  }
-
-                                 $item_list[] = $item_tp;
+                                $nom['characteristics'] = array_values($nom['characteristics']);
+                                $noms[] = $nom;
 
                              }
-
-                             if(!empty($item_list)){
-                                 foreach ($item_list as $item){
-                                     if ($item['imtId'])
-                                         $res .= $item['supplierVendorCode']. ' ' .CMaxyssWb::UpdateCadr($item, $id_element, $arSettings["AUTHORIZATION"]).'<br>';
-                                     else
-                                         $res .= $item['supplierVendorCode']. ' ' .CMaxyssWb::UploadCadr($item, $id_element, $arSettings["AUTHORIZATION"]).'<br>';
-                                 }
-                             }
-
                          }
                          else
-                         {*/
+                         {
                         $img = array();
                         if ($key != 1) {
                             $nom = array(
@@ -339,7 +309,7 @@ if($_REQUEST['action'] == 'upload_card'){
                             }
 
 
-                            // фотки соберем со всех тп одного цвета
+                            // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
                             if ($size['FIELD'][$arSettings['BASE_PICTURE']]) {
                                 $img[] = $imgPath . CFile::GetPath($size['FIELD'][$arSettings['BASE_PICTURE']]);
                             }
@@ -349,7 +319,7 @@ if($_REQUEST['action'] == 'upload_card'){
                                 }
                             }
                             $img = array_merge($img, $item_info['img']);
-                            // фотки соберем со всех тп одного цвета
+                            // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
                             $size_wb = array();
                             if (strlen($size['tech-sizes']) > 0) {
                                 $size_wb['techSize'] = strval($size['tech-sizes']);
@@ -399,7 +369,7 @@ if($_REQUEST['action'] == 'upload_card'){
                         $nom['characteristics'] = array_values($nom['characteristics']);
                         $noms[] = $nom;
 
-                        /*}*/
+                        }
                     }
                     if (!empty($noms)) {
                         $res_upload = '';
@@ -421,24 +391,36 @@ if($_REQUEST['action'] == 'upload_card'){
                                     $res_upload = CAddinMaxyssWB::AddMediaFile($arImg['img'], $arImg['vendorCode'], $arSettings['AUTHORIZATION']);
                                     $res .= $id_element . ' ' . $res_upload . '<br>';
                                 }
+                            }else{
+                                $res .= $id_element . ' ' . GetMessage('WB_MAXYSS_PHOTO_NOT_PHOTO') . '<br>';
                             }
                         } else {
                             if ($_REQUEST['param'] != 'photo') {
+                            if ($arSettings['TP_AS_PRODUCT'] == 'Y') { // пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+                                foreach ($noms as $n) {
+                                    $res_upload = CAddinMaxyssWB::UploadCadrNewApiContent(array($n), $id_element, $arSettings["AUTHORIZATION"]);
+                                    $res .= $id_element . ' ' . $n['vendorCode'] . ' ' . $res_upload . '<br>';
+                                }
+                            }else {
                                 $res_upload = CAddinMaxyssWB::UploadCadrNewApiContent($noms, $id_element, $arSettings["AUTHORIZATION"]);
                                 $res .= $id_element . ' ' . $res_upload . '<br>';
                             }
+                        }
                             if (($res_upload == GetMessage("WB_MAXYSS_PRODUCT_UPLOAD") && !empty($arImgForUpload)) || ($_REQUEST['param'] == 'photo') && !empty($arImgForUpload)) {
                                 foreach ($arImgForUpload as $arImg) {
                                     $res_upload = CAddinMaxyssWB::AddMediaFile($arImg['img'], $arImg['vendorCode'], $arSettings['AUTHORIZATION']);
                                     $res .= $id_element . ' ' . $res_upload . '<br>';
                                 }
+                            }else{
+                                $res .= $id_element . ' ' . GetMessage('WB_MAXYSS_PHOTO_NOT_PHOTO') . '<br>';
                             }
                         }
                     } else {
                         $res .= $id_element . ' ' . GetMessage("WB_MAXYSS_PRODUCT_NOT_NOM");
                     }
                 }
-            } elseif ($arTovar['TYPE'] == 1 || !isset($arTovar['TYPE'])) {
+            }
+            elseif ($arTovar['TYPE'] == 1 || !isset($arTovar['TYPE'])) {
 
                 $item_info['item']['characteristics'] = array_values($item_info['item']['characteristics']);
 
@@ -465,6 +447,8 @@ if($_REQUEST['action'] == 'upload_card'){
                         if (!empty($item_info['img'])) {
                             $res_upload = CAddinMaxyssWB::AddMediaFile($item_info['img'], $item_info['item']['VendorCode'], $arSettings['AUTHORIZATION']);
                             $res .= $id_element . ' ' . $res_upload . '<br>';
+                        }else{
+                            $res .= $id_element . ' ' . GetMessage('WB_MAXYSS_PHOTO_NOT_PHOTO') . '<br>';
                         }
                     }
                 } else {
@@ -482,9 +466,12 @@ if($_REQUEST['action'] == 'upload_card'){
                             $res_upload = CAddinMaxyssWB::AddMediaFile($item_info['img'], $item_info['item']['VendorCode'], $arSettings['AUTHORIZATION']);
                             $res .= $id_element . ' ' . $res_upload . '<br>';
                         }
+                        else{
+                            $res .= $id_element . ' ' . GetMessage('WB_MAXYSS_PHOTO_NOT_PHOTO') . '<br>';
+                        }
                 }
             } else {
-                // не выгружаем
+                // пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                 $res .= GetMessage("WB_MAXYSS_ERROR_NOT_PRODUCT");
             }
 
@@ -525,7 +512,7 @@ if($_REQUEST['action'] == 'data_card'){
         $article = array();
         $colors_add = array();
 
-        // ищем по article
+        // пїЅпїЅпїЅпїЅ пїЅпїЅ article
         $arInfoOff = CCatalogSKU::GetInfoByProductIBlock($iblockId);
         //////////////////////////  colors
         if (is_array($arInfoOff)) {
@@ -593,6 +580,11 @@ if($_REQUEST['action'] == 'data_card'){
             }
             if (!empty($arOffers)) {
                 foreach ($arOffers as $key => $color) {
+                if ($arSettings['TP_AS_PRODUCT'] == 'Y') { // пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+                    foreach ($color as $size) {
+                        $article[] = array('code' => ($arSettings['ARTICLE'] == '') ? $size['FIELD']['ID'] : $size["PROP"][$arSettings['ARTICLE']]["VALUE"], 'id' => $size['FIELD']['ID']);
+                    }
+                }else{
                     if ($key != 1) {
                         $colors_add[] = '_' . str_replace(array('-', ' '), '_', $key);
                     } else {
@@ -601,6 +593,7 @@ if($_REQUEST['action'] == 'data_card'){
                 }
             }
         }
+    }
         //////////////////////////
 
         if ($iblock_article != '') {
@@ -612,6 +605,11 @@ if($_REQUEST['action'] == 'data_card'){
                     }
                 }
             } elseif ($arTovar['TYPE'] == 3) {
+            if ($arSettings['TP_AS_PRODUCT'] == 'Y') { // пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+
+            }
+            else
+            {
                 $dbPropSC = CIBlockElement::GetProperty($iblockId, $id_element, "sort", "asc", array("CODE" => $iblock_article));
                 if ($arPropSC = $dbPropSC->GetNext()) {
                     if ($arPropSC['VALUE']) {
@@ -625,10 +623,17 @@ if($_REQUEST['action'] == 'data_card'){
                     }
                 }
             }
-        } else {
+        }
+    }
+    else
+    {
             if ($arTovar['TYPE'] == 1) {
                 $article[] = array('code' => $id_element, 'id' => $id_element);
             } elseif ($arTovar['TYPE'] == 3) {
+            if ($arSettings['TP_AS_PRODUCT'] == 'Y') { // пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+
+            }
+            else {
                 if (!empty($colors_add)) {
                     foreach ($colors_add as $cl) {
                         $article[] = array('code' => $id_element . $cl, 'id' => $id_element);
@@ -638,6 +643,7 @@ if($_REQUEST['action'] == 'data_card'){
                 }
             }
         }
+    }
         if (!empty($article)) {
             foreach ($article as $a) {
                 $ar_cards = CAddinMaxyssWB::GetCardForArticle($a['code'], $id_element, $arSettings["UUID"], $arSettings["AUTHORIZATION"]);
@@ -656,7 +662,7 @@ if($_REQUEST['action'] == 'data_card'){
                                     $mess = GetMessage("MAXYSS_WB_NO_CARD_CREATE");
                                 } else {
                                     $count_nm++;
-                                    if ($count_nm == 1) {
+                                if($count_nm == 1 && $arSettings['TP_AS_PRODUCT'] != 'Y') {
                                         $VALUES = array();
                                         $flag_add_cab = true;
                                         $res = CIBlockElement::GetProperty($iblockId, $a['id'], "id", "asc", array("CODE" => "PROP_MAXYSS_CARDID_WB"));
@@ -741,7 +747,92 @@ if($_REQUEST['action'] == 'data_card'){
                                             }
                                         }
 
-                                    } elseif ($arTovar['TYPE'] == 3) {
+                                }
+                                elseif($arTovar['TYPE'] == 3)
+                                {
+                                    if($arSettings['TP_AS_PRODUCT'] == 'Y'){
+                                        $iblockIdTp = 0;
+                                        $prop_upd[] = "PROP_MAXYSS_CARDID_WB";
+                                        foreach ($card['sizes'] as $sizes) {
+                                            if ($iblock_shkod != '' && !empty($sizes['skus'])) {
+                                                $flag_found_barcode = false;
+                                                foreach ($sizes['skus'] as $barcode) {
+
+//                                                    $arFilterBarcode = Array("PROPERTY_" . $iblock_shkod => $barcode);
+//                                                    $dbTp = CIBlockElement::GetList(Array(), $arFilterBarcode, false, Array("nPageSize" => 1), $arSelect);
+//                                                    if ($arTp = $dbTp->GetNextElement()) {
+//                                                        $arFields = $arTp->GetFields();
+                                                        $id_tp = $a['id'];
+
+                                                        if ($iblockIdTp <= 0) {
+                                                            $iblockIdTp = \CIBlockElement::getIBlockByID($id_tp);
+                                                        }
+
+                                                        ///////////////////
+                                                        $VALUES = array();
+                                                        $res = CIBlockElement::GetProperty($iblockIdTp, $id_tp, "id", "asc", array("CODE" => "PROP_MAXYSS%"));
+                                                        while ($ob = $res->GetNext()) {
+                                                            if (array_search($ob['CODE'], $prop_upd) !== false) {
+
+                                                                $ar_val['VALUE'] = $ob['VALUE'];
+                                                                $ar_val['DESCRIPTION'] = ($ob['DESCRIPTION'] == '') ? 'DEFAULT' : $ob['DESCRIPTION'];
+                                                                $VALUES[$ob['CODE']][] = $ar_val;
+                                                            }
+                                                        }
+                                                        if (!empty($VALUES)) {
+                                                            foreach ($prop_upd as $code) {
+                                                                if (is_array($VALUES[$code])) {
+                                                                    foreach ($VALUES[$code] as $key => &$val) {
+                                                                        $add = true;
+                                                                        if ($val['DESCRIPTION'] == $cabinet) {
+                                                                            $add = false;
+                                                                            switch ($code) {
+                                                                                case 'PROP_MAXYSS_NMID_CREATED_WB':
+                                                                                    $val['VALUE'] = $card['nmID'];
+                                                                                    break;
+                                                                                case 'PROP_MAXYSS_CHRTID_CREATED_WB':
+                                                                                    $val['VALUE'] = $sizes['chrtID'];
+                                                                                    break;
+                                                                                case 'PROP_MAXYSS_CARDID_WB':
+                                                                                    $val['VALUE'] = $card['imtID'];
+                                                                                    break;
+                                                                            }
+                                                                        }
+                                                                        if ($add) {
+                                                                            switch ($code) {
+                                                                                case 'PROP_MAXYSS_NMID_CREATED_WB':
+                                                                                    $VALUES[$code][] = array("VALUE" => $card['nmID'], "DESCRIPTION" => $cabinet);
+                                                                                    break;
+                                                                                case 'PROP_MAXYSS_CHRTID_CREATED_WB':
+                                                                                    $VALUES[$code][] = array("VALUE" => $sizes['chrtID'], "DESCRIPTION" => $cabinet);
+                                                                                    break;
+                                                                                case 'PROP_MAXYSS_CARDID_WB':
+                                                                                    $VALUES[$code][] = array("VALUE" => $card['imtID'], "DESCRIPTION" => $cabinet);
+                                                                                    break;
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+//                                                        echo '<pre>', print_r($VALUES), '</pre>' ;
+                                                        if (intval($id_tp) > 0 && !empty($VALUES)) {
+                                                            CIBlockElement::SetPropertyValuesEx($id_tp, false, $VALUES);
+                                                        }
+                                                        $flag_found_barcode = true;
+                                                        break;
+//                                                    } else {
+//                                                        $ar_mess[] = $barcode . " - " . GetMessage("MAXYSS_WB_CARD_FOUND");
+//
+//                                                    }
+
+                                                }
+                                                if (!$flag_found_barcode) {
+                                                    $res = \Bitrix\Main\Web\Json::encode(array('success' => 'MAXYSS_WB_DATA_SUCCESS'));
+                                                }
+                                            } else $ar_mess[] = 'NOT FOUND PROPERTY BARCODE';
+                                        }
+                                    }else {
                                         $iblockIdTp = 0;
                                         foreach ($card['sizes'] as $sizes) {
 
@@ -916,6 +1007,7 @@ if($_REQUEST['action'] == 'data_card'){
                                 }
                             }
                         }
+                    }
 
                         if (!empty($ar_mess))
                             $res = \Bitrix\Main\Web\Json::encode(array('barcode_not_found' => implode(",\n", $ar_mess)));
@@ -962,7 +1054,7 @@ if($_REQUEST['action'] == 'upload_stock_null'){
         if (!empty($items["stocks"])) {
             foreach ($items["stocks"] as &$wh) {
                 foreach ($wh as &$item) {
-                    $item['amount'] = 0; // обнуляем остатки
+                    $item['amount'] = 0; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                 }
             }
             $flag_error = false;
@@ -1095,7 +1187,7 @@ if($_REQUEST['action'] == 'print_label_wb'){
                             $FPPath = $_SERVER["DOCUMENT_ROOT"] . '/upload/wb/' . $prop["VALUE"].FILE_TYPE_STIKER;
                             if($prop["VALUE"] != '') $flag_button = true;
                             if(!file_exists($FPPath))
-                                $arWbOrders[$arOrder['ID']]["MAXYSS_WB_NUMBER"] = intval($prop["VALUE"]);  /// типа что-то не сработало и файл не записался
+                                $arWbOrders[$arOrder['ID']]["MAXYSS_WB_NUMBER"] = intval($prop["VALUE"]);  /// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ-пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                             else
                             {
                                 $content = file_get_contents($FPPath);
@@ -1259,7 +1351,7 @@ if($_REQUEST['action'] == 'add_prop_sinc'){
 
             if ($_REQUEST['iblock_id'] > 0) {
 
-                // основной иблок
+                // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
                 $iblock_info = CCatalog::GetByIDExt(intval($_REQUEST["iblock_id"]));
 
                 if (is_array($iblock_info)) {
@@ -1385,6 +1477,7 @@ if($_REQUEST['action'] == 'deliver_supplie'){
 if($_REQUEST['action'] == 'stock_realy'){
     if($GLOBALS['APPLICATION']->GetGroupRight(MAXYSS_WB_NAME) >= "R"){
         if($_REQUEST['LK_WB']) $cabinet = $_REQUEST['LK_WB']; else $cabinet = 'DEFAULT';
+        if (LANG_CHARSET == 'windows-1251') $cabinet = CMaxyssWb::deepIconv($cabinet, 'UTF-8', 'windows-1251//IGNORE');
         $arSettings = CMaxyssWb::settings_wb($cabinet);
         $arStock = array();
         $arPrice = array();
@@ -1420,12 +1513,12 @@ if($_REQUEST['action'] == 'stock_realy'){
                     "LOGIC" => "OR",
                     array("!PROPERTY_PROP_MAXYSS_NMID_CREATED_WB" => false),
                     array("!PROPERTY_PROP_MAXYSS_CARDID_WB" => false),
-                    array("!PROPERTY_PROP_MAXYSS_NMID_CREATED_WB" => false),
+//                    array("!PROPERTY_PROP_MAXYSS_NMID_CREATED_WB" => false),
                 ),
                 "IBLOCK_ID" => $iblock_id,
                 ">ID"=>$_REQUEST['ID']);
         //        $arFilter = Array("!PROPERTY_PROP_MAXYSS_NMID_CREATED_WB" => false,"IBLOCK_ID" => $iblock_id);
-            $dbTp = CIBlockElement::GetList(Array("ID"=>"asc"), $arFilter, false, array('nTopCount'=>200), $arSelect);
+            $dbTp = CIBlockElement::GetList(Array("ID"=>"asc"), $arFilter, false, array('nTopCount'=> Option::get(MAXYSS_WB_NAME, "COUNT_STEP_EL", 200)), $arSelect);
             $arSkus = array();
             while ($arTp = $dbTp->GetNextElement()) {
                 if(count($arSkus)>99) break;
@@ -1502,7 +1595,7 @@ if($_REQUEST['action'] == 'stock_realy'){
         ?>
         <?
         if(!empty($arElem)) {
-            $key_item = $_REQUEST['key_item'];
+            $key_item = htmlspecialcharsbx($_REQUEST['key_item']);
             foreach ($arElem as $item) {
                 $key_item++;
                 ?>

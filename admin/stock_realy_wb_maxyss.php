@@ -149,9 +149,14 @@ if(Loader::includeModule('sale') && Loader::includeModule('iblock') && CModule::
         }
     }
 $arLk = CMaxyssWb::get_setting_wb('AUTHORIZATION');
+    if ($_REQUEST['COUNT_STEP_EL'] && $GLOBALS['APPLICATION']->GetGroupRight(MAXYSS_WB_NAME) >= "R") {
+        Option::set(MAXYSS_WB_NAME, "COUNT_STEP_EL", htmlspecialcharsbx($_REQUEST['COUNT_STEP_EL']));
+    }
     ?>
     <form id="lk_form" method="get" action="<?=MAXYSS_WB_NAME?>_stock_realy_wb_maxyss.php?lang=<?=LANGUAGE_ID?>" style="margin-bottom: 10px">
         <input type="hidden" name="lang" value="<?=LANGUAGE_ID?>">
+        <? $count_step_el = Option::get(MAXYSS_WB_NAME, "COUNT_STEP_EL", 200);?>
+        <input type="hidden" disabled name="COUNT_STEP_EL" value="<?echo  ($count_step_el > 0)? $count_step_el : 200?>">
         <select name="LK_WB" onchange="$('#lk_form').submit();">
             <?foreach ($arLk as $key=>$auth){?><option <?echo ($cabinet == $key)? 'selected="selected"' : '';?> value="<?=$key?>"><?=$key?></option><?}?>
         </select><label style="margin-left: 10px"><?=GetMessage('MAXYSS_WB_CUSTOM_CABINET')?></label><br>

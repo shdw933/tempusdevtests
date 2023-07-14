@@ -189,7 +189,7 @@ class CRestQueryWB{
         return $result;
     }
 
-    public static function rest_warehouses_get($Authorization = false, $base_url = WB_BASE_URL, $data_string = '', $path='/api/v2/warehouses')
+    public static function rest_warehouses_get($Authorization = false, $base_url = WB_BASE_URL, $data_string = '', $path='/api/v3/warehouses')
     {
 
         if(!$Authorization) $Authorization = CMaxyssWb::get_setting_wb("AUTHORIZATION", "DEFAULT");
@@ -584,11 +584,11 @@ class CRestQueryWB{
             //unauthorized
             $res = array('error' => 'unauthorized');
         }elseif($str_result->info->http_code == 409){
-            // Некорректный статус поставки
-            $res = array('error' => 'Уже есть активная поставка');
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+            $res = array('error' => 'пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
         }else{
-            // Внутренняя ошибка сервера 500
-            $res = array('error' => 'Внутренняя ошибка сервера');
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 500
+            $res = array('error' => 'пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
         }
         return $res;
     }
@@ -716,6 +716,34 @@ class CHelpMaxyssWB{
         }
         return $res;
     }
+    public static function memory_ms($print = false, $clear = false, $flag = 'MAXYSS_MEM'){
+        if($clear) $GLOBALS[$flag] = array();
+        $GLOBALS[$flag][] = memory_get_usage();
+        $name = array('пїЅпїЅпїЅпїЅ', 'пїЅпїЅ', 'пїЅпїЅ');
+        $arMem = array();
+        if(!empty($GLOBALS[$flag])) {
+            $mem = $GLOBALS[$flag];
+            foreach ($mem as $key => $m) {
+                if ($key > 0) {
+                    $memory = $m - $mem[$key - 1];
+                    $i = 0;
+                    while (floor($memory / 1024) > 0) {
+                        $i++;
+                        $memory /= 1024;
+                    }
+                    $arMem[] = round($memory, 2) . ' ' . $name[$i];
+                }
+            }
+            $memoryall = $mem[$key] - $mem[0];
+            $i = 0;
+            while (floor($memoryall / 1024) > 0) {
+                $i++;
+                $memoryall /= 1024;
+            }
+            $arMem[] = round($memoryall, 2) . ' ' . $name[$i];
+        }
+        if($print) echo '<pre>', print_r($arMem), '</pre>' ; ;
+    }
 }
 class CMaxyssWbEvents{
     public static function ElementUpdate(&$arFields)
@@ -767,7 +795,7 @@ class CMaxyssWbEvents{
                 'CANCEL'=> 3
             );
 
-            $id = ''; // номер заказа в системе wb.ru
+            $id = ''; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ wb.ru
             $warehouseId = false;
             $propertyCollection = $order->getPropertyCollection();
             foreach ($propertyCollection as $prop) {
@@ -799,15 +827,15 @@ class CMaxyssWbEvents{
                         $oldStatus = $oldValues["STATUS_ID"];
                         $flag_put = false;
 
-                        if (in_array(array_search($oldStatus, $arSettings['STATUS_BY']), array(1, 3, 4, 5, 6,))) $flag_put = false; //echo 'отменен, возврат, транзит, отказ покупателя, отгружен - больше не устанавливаем никакой новый статус';
-                        elseif (array_search($oldStatus, $arSettings['STATUS_BY']) === false) $flag_put = true; // echo 'нет старого статуса - устанавливаем любой новый';
-                        elseif (array_search($oldStatus, $arSettings['STATUS_BY']) < array_search($orderStatus, $arSettings['STATUS_BY'])) $flag_put = true; // echo ' устанавливаем новый статус';
-                        elseif (array_search($oldStatus, $arSettings['STATUS_BY']) == 2 && array_search($orderStatus, $arSettings['STATUS_BY']) == 1) $flag_put = true; //echo ' устанавливаем новый статус = отмена после сборки';
-                        else $flag_put = false; //echo 'не устанавливаем новый статус, так как он меньше старого';
+                        if (in_array(array_search($oldStatus, $arSettings['STATUS_BY']), array(1, 3, 4, 5, 6,))) $flag_put = false; //echo 'пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ';
+                        elseif (array_search($oldStatus, $arSettings['STATUS_BY']) === false) $flag_put = true; // echo 'пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ';
+                        elseif (array_search($oldStatus, $arSettings['STATUS_BY']) < array_search($orderStatus, $arSettings['STATUS_BY'])) $flag_put = true; // echo ' пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ';
+                        elseif (array_search($oldStatus, $arSettings['STATUS_BY']) == 2 && array_search($orderStatus, $arSettings['STATUS_BY']) == 1) $flag_put = true; //echo ' пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ = пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ';
+                        else $flag_put = false; //echo 'пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ';
                         if ($flag_put) {
                             if ($trigger_status == 'CLIENT_RECEIVED') {
-                                // ищем открытую поставку и добавляем в нее заказ
-//                            $result = CMaxyssWb::putStatusOrders($id, $status, $arSettings["AUTHORIZATION"]); // устарел
+                                // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+//                            $result = CMaxyssWb::putStatusOrders($id, $status, $arSettings["AUTHORIZATION"]); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
                                 $supplies = new CMaxyssWbSupplies($cabinet);
                                 $open_supplies = $supplies->confirmOrderToSupplie($id, $warehouseId);
@@ -815,7 +843,7 @@ class CMaxyssWbEvents{
                                 if ($open_supplies['success']) {
                                     CHelpMaxyssWB::unsetMarkedOrder($order, $order);
 
-                                    //// стикер
+                                    //// пїЅпїЅпїЅпїЅпїЅпїЅ
                                     if (!empty($ids_stiker_get)) {
                                         $data_string = \Bitrix\Main\Web\Json::encode(array('orders' => $ids_stiker_get));
                                         $width = 58;
@@ -880,7 +908,11 @@ class CMaxyssWbEvents{
 
                                                                 if (!empty($value) && $old_value == '') {
                                                                     $prop->setValue($value);
-                                                                    $order->save();
+
+                                                                    $event = new \Bitrix\Main\Event(MAXYSS_WB_NAME, "OnStikerNew", array(&$order, $val_sticker['orderId'], $val_sticker));
+                                                                    $event->send();
+
+//                                                                    $order->save();
                                                                     break;
                                                                 }
                                                             }
@@ -893,12 +925,12 @@ class CMaxyssWbEvents{
                                             $eventLog->Add(array("SEVERITY" => 'INFO', "AUDIT_TYPE_ID" => 'get_stickers', "MODULE_ID" => MAXYSS_WB_NAME, "ITEM_ID" => "$Authorization", "DESCRIPTION" => $str_result->info->http_code));
                                         }
                                     }
-                                    //// стикер
+                                    //// пїЅпїЅпїЅпїЅпїЅпїЅ
                                 } elseif ($open_supplies['error']) {
                                     CHelpMaxyssWB::setMarkedOrder($order, $order, GetMessage('WB_MAXYSS_PUT_STATUS_ERROR') . " " . $open_supplies['error'], $open_supplies['error']);
                                 }
                             } elseif ($trigger_status == 'CANCEL') {
-                                // Отменяем заказ https://suppliers-api.wildberries.ru/api/v3/orders/{order}/cancel
+                                // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ https://suppliers-api.wildberries.ru/api/v3/orders/{order}/cancel
 
                                 $Authorization = $arSettings['AUTHORIZATION'];
 
@@ -953,7 +985,7 @@ class CMaxyssWbEvents{
                                     }
                                 }
                             } else {
-                                // ничего не делаем так как устарело
+                                // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                             }
 
                         }
@@ -972,12 +1004,17 @@ class CMaxyssWbEvents{
             $list->arActions['wb_upload'] = array(
                 'name' => GetMessage("WB_MAXYSS_CONTEXT_MENU"),
                 'type' => 'customJs',
-                'js' => 'uploadSelectItems(BX.Main.gridManager.getById(\''.$list->table_id.'\').instance.rows.getSelectedIds())'
+                'js' => 'uploadSelectItems(BX.Main.gridManager.getById(\''.$list->table_id.'\').instance.rows.getSelectedIds(), 0)'
             );
             $list->arActions['wb_get_id'] = array(
                 'name' => GetMessage("WB_MAXYSS_CONTEXT_MENU_GET"),
                 'type' => 'customJs',
                 'js' => 'getWBAttributesSelectItems(BX.Main.gridManager.getById(\''.$list->table_id.'\').instance.rows.getSelectedIds())'
+            );
+            $list->arActions['wb_get_photo'] = array(
+                'name' => GetMessage("WB_MAXYSS_UPLOAD_WB_PHOTO"),
+                'type' => 'customJs',
+                'js' => 'uploadSelectItems(BX.Main.gridManager.getById(\''.$list->table_id.'\').instance.rows.getSelectedIds(), \'photo\')'
             );
         }
     }

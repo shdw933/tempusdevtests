@@ -152,7 +152,7 @@ class CMaxyssWb{
         $arSettings['PAYSYSTEM'] = unserialize(Option::get(MAXYSS_WB_NAME, "PAYSYSTEM", ""));
         $arSettings['USER_DEFAULTE'] = unserialize(Option::get(MAXYSS_WB_NAME, "USER_DEFAULTE", ""));
 
-        // статусы
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         $arSettings['NEW'] = unserialize(Option::get(MAXYSS_WB_NAME, "NEW", "N"));
         $arSettings['CANCEL'] = unserialize(Option::get(MAXYSS_WB_NAME, "CANCEL", "N"));
         $arSettings['CLIENT_RECEIVED'] = unserialize(Option::get(MAXYSS_WB_NAME, "CLIENT_RECEIVED", "N"));
@@ -162,6 +162,9 @@ class CMaxyssWb{
         $arSettings['RETURN_PRODUCT'] = unserialize(Option::get(MAXYSS_WB_NAME, "RETURN_PRODUCT", "N"));
         $arSettings['TRIGGERS'] = unserialize(Option::get(MAXYSS_WB_NAME, 'TRIGGERS', ''));
         $arSettings['CUSTOM_FILTER'] = unserialize(Option::get(MAXYSS_WB_NAME, 'CUSTOM_FILTER', ''));
+        $arSettings['FLAG_SHIPMENT_UP'] = unserialize(Option::get(MAXYSS_WB_NAME, 'FLAG_SHIPMENT_UP', ''));
+        $arSettings['FLAG_CANCELLED_UP'] = unserialize(Option::get(MAXYSS_WB_NAME, 'FLAG_CANCELLED_UP', ''));
+        $arSettings['FLAG_PAYMENT_UP'] = unserialize(Option::get(MAXYSS_WB_NAME, 'FLAG_PAYMENT_UP', ''));
         if($cabinet != '') {
 
             foreach ($arSettings as $key => &$sett) {
@@ -218,9 +221,22 @@ class CMaxyssWb{
         {
             $host = $arSite["SERVER_NAME"];
         }
-        require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/update_client_partner.php");
+//        require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/update_client_partner.php");
         $arInfo = array();
-        $arInfo['key'] = CUpdateClientPartner::GetLicenseKey();
+
+        if (defined("US_LICENSE_KEY"))
+            $LICENSE_KEY =  US_LICENSE_KEY;
+        elseif (defined("LICENSE_KEY"))
+            $LICENSE_KEY =   LICENSE_KEY;
+        else
+        {
+            $LICENSE_KEY = "demo";
+            if (file_exists($_SERVER["DOCUMENT_ROOT"]."/bitrix/license_key.php"))
+                include($_SERVER["DOCUMENT_ROOT"]."/bitrix/license_key.php");
+        }
+
+//        $arInfo['key'] = $LICENSE_KEY;
+        $arInfo['key'] = md5("BITRIX".$LICENSE_KEY."LICENCE");
         $arInfo['host'] = $host;
         $data_string = array(
             'info' => $arInfo
@@ -538,7 +554,7 @@ class CMaxyssWb{
 
                     $addin_card_ = CUtil::JsObjectToPhp($addin_card);
 
-                    // фотки
+                    // пїЅпїЅпїЅпїЅпїЅ
                     $imgPath = $_SERVER['DOCUMENT_ROOT'];
 
                     $img = array();
@@ -554,7 +570,7 @@ class CMaxyssWb{
             }
             if (!is_array($addin_card_)) return false;
 
-            // цвет, размер, ... для основной карточки
+            // пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ, ... пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             $dependencies = [];
             if (file_exists($_SERVER['DOCUMENT_ROOT'] . "/bitrix/modules/" . MAXYSS_WB_NAME . "/dependencies.txt")) {
                 $dependencies = CUtil::JsObjectToPhp(file_get_contents($_SERVER['DOCUMENT_ROOT'] . "/bitrix/modules/" . MAXYSS_WB_NAME . "/dependencies.txt"));
@@ -650,7 +666,7 @@ class CMaxyssWb{
 
             $addin_card = array_values($addin_card);
 
-            // Ключевые слова
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
             $arTags = array();
             if($arFields["TAGS"] !='') {
                 $arTags = explode(',', $arFields["TAGS"]);
@@ -718,16 +734,16 @@ class CMaxyssWb{
                     "supplierVendorCode" => ($arSettings['ARTICLE']=='')? $arFields['ID'] : $arFields["PROPERTY_".strtoupper($arSettings['ARTICLE'])."_VALUE"],
                     "countryProduction" => $land,
                     "nomenclatures" => array(
-                        array( // Массив номенклатур товара.
-                            "vendorCode" => ($arSettings['ARTICLE']=='')? $arFields['ID'] : $arFields["PROPERTY_".strtoupper($arSettings['ARTICLE'])."_VALUE"].$article_dop, // Артикул товара.
+                        array( // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.
+                            "vendorCode" => ($arSettings['ARTICLE']=='')? $arFields['ID'] : $arFields["PROPERTY_".strtoupper($arSettings['ARTICLE'])."_VALUE"].$article_dop, // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.
                             "variations" => array(
-                                array( // Массив вариаций товара. Одна цена - одна вариация.
-                                    "barcode" => $arFields["PROPERTY_".strtoupper($arSettings['SHKOD'])."_VALUE"], // Штрихкод товара.
+                                array( // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+                                    "barcode" => $arFields["PROPERTY_".strtoupper($arSettings['SHKOD'])."_VALUE"], // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.
                                     "barcodes"=>array($arFields["PROPERTY_".strtoupper($arSettings['SHKOD'])."_VALUE"]),
                                     "addin" => array(
 //                                        array(
 //                                            "type" => GetMessage("WB_MAXYSS_PRICE"),
-//                                            "params" => array( // У хар-ик, содержащих одно значение, массив будет содержать только 1 элемент.
+//                                            "params" => array( // пїЅ пїЅпїЅпїЅ-пїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 1 пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 //                                                array(
 //                                                    "count" => self::get_price($arSettings['PRICE_TYPE'], $arSettings['PRICE_PROP'], $arSettings['PRICE_TYPE_PROP'], $arSettings['PRICE_TYPE_NO_DISCOUNT'], $arFields['ID'], $lid, $arSettings["PRICE_TYPE_FORMULA"], $arSettings["PRICE_TYPE_FORMULA_ACTION"]),
 //                                                    "units" => GetMessage("WB_MAXYSS_RUB"),
@@ -819,7 +835,7 @@ class CMaxyssWb{
 
         $amount = 0;
         if($ar_tovar['TYPE']!=3) {
-            if (array_key_exists("WAREHOUSES", $arSettings)) { // dbs
+            if (array_key_exists("WAREHOUSES", $arSettings) && !empty($arSettings['WAREHOUSES'])) { // dbs
                 $arTovar = $ar_tovar;
                 $arTovar['WAREHOUSES'] = array();
                 $allStores = array();
@@ -1041,7 +1057,7 @@ class CMaxyssWb{
             $arInfo = CMaxyssWb::GetLicense();
             $data_string = array(
                 "id" => md5("BITRIX" . $arInfo['key'] . time() . "LICENCE"),
-                "jsonrpc" => "2.0", // Версия протокола. Всегда должна быть "2.0".
+                "jsonrpc" => "2.0", // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ "2.0".
                 'params' => array(
                     "imtID" => intval($id),
                 )
@@ -1122,7 +1138,7 @@ class CMaxyssWb{
         return \Bitrix\Main\Web\Json::decode($arResult);
     }
 
-    /// остатки
+    /// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     public static function prepareItemStock($id, $quantity, $arSettings){
         $lid = $arSettings['SITE'];
         $items = array();
@@ -1187,10 +1203,10 @@ class CMaxyssWb{
                 ),
             )
         );
-//        if($arSettings["FILTER_PROP"] != '' && $arSettings["FILTER_PROP_ID"] !=''){
-//            $arFilter['PROPERTY_'.$arSettings["FILTER_PROP"]] =  $arSettings["FILTER_PROP_ID"];
-//        }
 
+        $arNavStrParam = false;
+        if(isset($arrFilter['ID']))
+            $arNavStrParam = array('nPageSize'=>500);
         $arCustomFilter = array();
         if($arSettings["CUSTOM_FILTER"]) {
             $filter_custom = new FilterCustomWB();
@@ -1207,7 +1223,8 @@ class CMaxyssWb{
             $arFilter[] = $arCustomFilter;
         }
 //        echo '<pre>', print_r($arFilter), '</pre>' ;
-        $res = CIBlockElement::GetList(Array("ID" => "ASC"), $arFilter, false, false, $arSelect);
+
+        $res = CIBlockElement::GetList(Array("ID" => "ASC"), $arFilter, false, $arNavStrParam, $arSelect);
 
         $arIds = array();
         while ($ob = $res->GetNextElement()) {
@@ -1253,32 +1270,32 @@ class CMaxyssWb{
                             if (intval($arFields["PROPERTY_PROP_MAXYSS_NMID_CREATED_WB_VALUE"]) > 0) {
                                 $prices = array(
                                     "nmId" => $item_nmId,
-                                    "price" => self::get_price($arSettings['PRICE_TYPE'], $arSettings['PRICE_PROP'], $arSettings['PRICE_TYPE_PROP'], $arSettings['PRICE_TYPE_NO_DISCOUNT'], $arFields['ID'], $arSettings["SITE"], $arSettings["PRICE_TYPE_FORMULA"], $arSettings["PRICE_TYPE_FORMULA_ACTION"]), // цена товара - норм
+                                    "price" => self::get_price($arSettings['PRICE_TYPE'], $arSettings['PRICE_PROP'], $arSettings['PRICE_TYPE_PROP'], $arSettings['PRICE_TYPE_NO_DISCOUNT'], $arFields['ID'], $arSettings["SITE"], $arSettings["PRICE_TYPE_FORMULA"], $arSettings["PRICE_TYPE_FORMULA_ACTION"]), // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅ
                                 );
 
                                 $item_prices[] = $prices;
 
                                 // discounts
                                 if (intval($arFields["PROPERTY_PROP_MAXYSS_DISCOUNTS_WB_VALUE"]) > 0) {
-                                    // установка скидок
+                                    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
                                     $item_discounts[] = array(
                                         "discount" => intval($arFields["PROPERTY_PROP_MAXYSS_DISCOUNTS_WB_VALUE"]),
                                         "nm" => $item_nmId,
                                     );
                                 } else {
-                                    // сброс скидок
+                                    // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
                                     $item_discounts_revoke[] = $item_nmId;
                                 }
 
 //                                // promocodes
 //                                if (intval($arFields["PROPERTY_PROP_MAXYSS_PROMOCODES_WB_VALUE"]) > 0) {
-//                                    // установка промокодов
+//                                    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 //                                    $item_promocodes[] = array(
 //                                        "discount" => intval($arFields["PROPERTY_PROP_MAXYSS_PROMOCODES_WB_VALUE"]),
 //                                        "nm" => intval($arFields["PROPERTY_PROP_MAXYSS_NMID_CREATED_WB_VALUE"]),
 //                                    );
 //                                } else {
-//                                    // сброс промокодов
+//                                    // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 //                                    $item_promocodes_revoke[] = intval($arFields["PROPERTY_PROP_MAXYSS_NMID_CREATED_WB_VALUE"]);
 //                                }
 
@@ -1376,14 +1393,14 @@ class CMaxyssWb{
                                     $discount = max($tp_discounts);
                                 }
                                 if ($discount > 0) {
-                                    // установка скидок
+                                    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
                                     $discounts = array(
                                         "discount" => $discount,
                                         "nm" => intval($key),
                                     );
                                     $item_discounts[] = $discounts;
                                 } else {
-                                    // сброс скидок
+                                    // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
                                     $item_discounts_revoke[] = intval($key);
                                 }
 
@@ -1396,13 +1413,13 @@ class CMaxyssWb{
 //                                }
 //
 //                                if ($promocode > 0) {
-//                                    // установка промокодов
+//                                    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 //                                    $item_promocodes[] = array(
 //                                        "discount" => $promocode,
 //                                        "nm" => $key,
 //                                    );
 //                                } else {
-//                                    // сброс промокодов
+//                                    // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 //                                    $item_promocodes_revoke[] = $key;
 //                                }
 
@@ -1412,8 +1429,21 @@ class CMaxyssWb{
                     }
                 }
             }
+//            unset($arFields, $arProps, $arFieldsOff, $arPropOff, $ar_tovar, $ar_tovar_off);
         }
-        return array("stocks"=>$item, "prices"=>$item_prices, "discounts"=>$item_discounts, "discounts_revoke"=>$item_discounts_revoke, "promocodes"=>$item_promocodes,"promocodes_revoke"=>$item_promocodes_revoke);
+        if(isset($arrFilter['ID']) && isset($arFields['ID']) && $arFields['ID']>0){
+            $arrFilter = array('>ID' => $arFields['ID']);
+        }
+        elseif (isset($arrFilter['ID']) && !isset($arFields['ID'])){
+            $arrFilter = array('>ID' => 0);
+        }
+        return array(
+            "stocks"=>$item,
+            "prices"=>$item_prices,
+            "discounts"=>$item_discounts,
+            "discounts_revoke"=>$item_discounts_revoke,
+            'arrFilter' => $arrFilter
+            );
     }
 
     public static function prepareAllItemsPrice($arSettings, $arrFilter = array()){
@@ -1491,25 +1521,25 @@ class CMaxyssWb{
 
                         // discounts
                         if (intval($arFields["PROPERTY_PROP_MAXYSS_DISCOUNTS_WB_VALUE"]) > 0) {
-                            // установка скидок
+                            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
                             $item_discounts[] = array(
                                 "discount" => intval($arFields["PROPERTY_PROP_MAXYSS_DISCOUNTS_WB_VALUE"]),
                                 "nm" => $item_nmId,
                             );
                         } else {
-                            // сброс скидок
+                            // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
                             $item_discounts_revoke[] = $item_nmId;
                         }
 
 //                        // promocodes
 //                        if (intval($arFields["PROPERTY_PROP_MAXYSS_PROMOCODES_WB_VALUE"]) > 0) {
-//                            // установка промокодов
+//                            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 //                            $item_promocodes[] = array(
 //                                "discount" => intval($arFields["PROPERTY_PROP_MAXYSS_PROMOCODES_WB_VALUE"]),
 //                                "nm" => intval($arFields["PROPERTY_PROP_MAXYSS_NMID_CREATED_WB_VALUE"]),
 //                            );
 //                        } else {
-//                            // сброс промокодов
+//                            // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 //                            $item_promocodes_revoke[] = intval($arFields["PROPERTY_PROP_MAXYSS_NMID_CREATED_WB_VALUE"]);
 //                        }
 
@@ -1576,14 +1606,14 @@ class CMaxyssWb{
                                     $discount = max($tp_discounts);
                                 }
                                 if ($discount > 0) {
-                                    // установка скидок
+                                    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
                                     $discounts = array(
                                         "discount" => $discount,
                                         "nm" => intval($key),
                                     );
                                     $item_discounts[] = $discounts;
                                 } else {
-                                    // сброс скидок
+                                    // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
                                     $item_discounts_revoke[] = intval($key);
                                 }
 
@@ -1596,13 +1626,13 @@ class CMaxyssWb{
 //                                }
 //
 //                                if ($promocode > 0) {
-//                                    // установка промокодов
+//                                    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 //                                    $item_promocodes[] = array(
 //                                        "discount" => $promocode,
 //                                        "nm" => $key,
 //                                    );
 //                                } else {
-//                                    // сброс промокодов
+//                                    // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 //                                    $item_promocodes_revoke[] = $key;
 //                                }
 
@@ -1627,7 +1657,7 @@ class CMaxyssWb{
         $arCabinet = false;
         $flag_upd = false;
         if (is_array($mxResult)) {
-            // это ТП
+            // пїЅпїЅпїЅ пїЅпїЅ
             if(is_array($arSettings["IBLOCK_ID"])){
                 foreach ($arSettings["IBLOCK_ID"] as $cabinet => $iblock){
                     $flag_upd = false;
@@ -1693,7 +1723,7 @@ class CMaxyssWb{
         }
         else
         {
-            // это товар
+            // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
             if(is_array($arSettings["IBLOCK_ID"])){
                 foreach ($arSettings["IBLOCK_ID"] as $cabinet => $iblock){
                     $flag_upd = false;
@@ -1750,7 +1780,7 @@ class CMaxyssWb{
     }
 
     public static function uploadStock($event){
-        // остаток по событию изменения полного доступного количества
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         $item = $event->getParameters();
         $result = '';
         $ar_tovar = CCatalogProduct::GetByID($item["id"]); // item as product
@@ -1772,7 +1802,8 @@ class CMaxyssWb{
     }
 
     public static function uploadAllStocks($cabinet = 'DEFAULT', $arrFilter = array()){
-        // отправить все остатки (агент)
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅ)
+
         $arSettings = self::settings_wb($cabinet);
         $Authorization = $arSettings['AUTHORIZATION'];
 
@@ -1795,8 +1826,10 @@ class CMaxyssWb{
         }
 
         $res_agent = "CMaxyssWb::uploadAllStocks('".$cabinet."');";
-        if(!empty($arrFilter))
-            $res_agent = "CMaxyssWb::uploadAllStocks('".$cabinet."', ".var_export($arrFilter, true).");";
+        if(!empty($arrFilter)) {
+            $arrFilter = $items['arrFilter'];
+            $res_agent = "CMaxyssWb::uploadAllStocks('" . $cabinet . "', " . var_export($arrFilter, true) . ");";
+        }
 
         return $res_agent;
     }
@@ -1858,48 +1891,8 @@ class CMaxyssWb{
         }
         return $stocks;
     }
-    public static function getStock($Authorization = false, $stocks=array(), $skip = 0){
-        // deprecated
-        $arResult = array();
-        $stocks_add = $stocks;
-        $data_string = array();
-        $arResult = CRestQueryWB::rest_stock_get($base_url = WB_BASE_URL, $data_string, "/api/v2/stocks?skip=".$skip."&take=1000&sort=article&order=asc", $Authorization);
-        if(!empty($arResult['stocks'])) {
-            $stocks_add = array_merge($stocks, $arResult['stocks']);
-            if (count($arResult['stocks']) > 0 && count($arResult['stocks']) >= $skip) {
-                $skip = $skip + 1000;
-                return self::getStock($Authorization, $stocks_add, $skip);
-            } else {
-                return array('total' => $arResult['total'], 'stocks' => $stocks_add);
-            }
-        }else{
-            return array('total' => $arResult['total'], 'stocks' => $stocks);
-        }
-    }
 
-    public static function deleteNom($cabinet = 'DEFAULT', $nomId = 0){
-//        /card/deleteNomenclature
-        $arSettings = self::settings_wb($cabinet);
-        $Authorization = $arSettings['AUTHORIZATION'];
-        $supplierID = $arSettings['UUID'];
-
-        $arInfo = CMaxyssWb::GetLicense();
-        $data_string = array(
-            "id" => md5("BITRIX".$arInfo['key'].time()."LICENCE"),
-            "jsonrpc" => "2.0",
-            'params' => array(
-                "query"=>array(
-                    "nomenclatureID"=> $nomId,
-                    "supplierID"=> $supplierID
-                ),
-            )
-        );
-        $data_string = \Bitrix\Main\Web\Json::encode($data_string);
-
-        $arResult = CRestQueryWB::rest_query_na($base_url = WB_BASE_URL, $data_string, "/card/deleteNomenclature", $Authorization);
-        return \Bitrix\Main\Web\Json::decode($arResult);
-    }
-    // заказы
+    // пїЅпїЅпїЅпїЅпїЅпїЅ
 
     public static function getStatusOrders($cabinet = 'DEFAULT', $id = 0){
         $arSettings = self::settings_wb($cabinet);
@@ -1907,6 +1900,7 @@ class CMaxyssWb{
         $Authorization = $arSettings['AUTHORIZATION'];
         $limit = $arSettings['COUNT_ORDER'];
         $ids_stiker_get = array();
+        $stikers = array();
         CheckDirPath($_SERVER["DOCUMENT_ROOT"] . "/upload/wb/");
 
         if($limit>1000) $limit = 1000;
@@ -1923,7 +1917,6 @@ class CMaxyssWb{
             array('nTopCount'=>$limit)
         );
         $select_counte = $rsOrders->SelectedRowsCount();
-
         while ($arOrder = $rsOrders->Fetch())
         {
             $arStatusOrder[$arOrder['ID']]=$arOrder['STATUS_ID'];
@@ -1940,15 +1933,17 @@ class CMaxyssWb{
                     $arBitrixToWbIds[$arOrder['ID']] = intval($arVals['VALUE']);
                 }
 
-                $db_vals = CSaleOrderPropsValue::GetList(
+                $db_vals_stiker = CSaleOrderPropsValue::GetList(
                     array(),
                     array(
                         "ORDER_ID" => $arOrder['ID'],
                         "CODE" => 'MAXYSS_WB_STIKER'
                     )
                 );
-                if ($arVals = $db_vals->Fetch()){
-
+                if ($arVals_stiker = $db_vals_stiker->Fetch()){
+                    if($arVals_stiker['VALUE'] != ''){
+                        $stikers[] = intval($arVals['VALUE']);
+                    }
                 }
             }
             $new_id = $arOrder['ID'];
@@ -1963,7 +1958,7 @@ class CMaxyssWb{
                 foreach ($res['orders'] as $wb_order){
                     if(is_array($arBitrixToWbIds))
                         $id_bx_order = array_search($wb_order['id'], $arBitrixToWbIds);
-                    if($wb_order['supplierStatus'] == 'confirm') $ids_stiker_get[] = $wb_order['id'];
+                    if($wb_order['supplierStatus'] == 'confirm' && array_search($wb_order['id'], $stikers) === false) $ids_stiker_get[] = $wb_order['id'];
                     if($id_bx_order)
                         self::setStatusV3($wb_order, $id_bx_order, $arStatusOrder[$id_bx_order], $arSettings);
                 }
@@ -2021,6 +2016,7 @@ class CMaxyssWb{
                                 $id_bx_order = false;
                                 if(is_array($arBitrixToWbIds))
                                     $id_bx_order = array_search($val_sticker['orderId'], $arBitrixToWbIds);
+
                                 if($id_bx_order) {
                                     $order_bx = Order::Load($id_bx_order);
                                     if(is_object($order_bx)) {
@@ -2056,7 +2052,6 @@ class CMaxyssWb{
                 } else{
                     $eventLog = new \CEventLog;
                     $eventLog->Add(array("SEVERITY" => 'INFO', "AUDIT_TYPE_ID" => 'get_stickers', "MODULE_ID" => MAXYSS_WB_NAME, "ITEM_ID" => "$Authorization", "DESCRIPTION" => $str_result->info->http_code));
-//                    $res = array('error' => $str_result->info->http_code);
                 }
             }
             /////////////////////////////
@@ -2073,48 +2068,55 @@ class CMaxyssWb{
     }
 
     public static function  setStatusV3($order_wb = array(), $id_bx_order = 0, $status_bx, $arSettings){
+
         if($id_bx_order > 0 && !empty($order_wb)){
             $status_result = '';
+            $flag_status_break = false;
             switch ($order_wb['supplierStatus'].$order_wb['wbStatus']){
                 case 'new'.'waiting':
-//                    echo '<pre>', print_r("Новый"), '</pre>' ; // 0
+//                    echo '<pre>', print_r("пїЅпїЅпїЅпїЅпїЅ"), '</pre>' ; // 0
                     $status_result = 0;
                     break;
                 case 'confirm'.'waiting':
-//                    echo '<pre>', print_r("На сборке"), '</pre>' ;//  2  1 - Принял заказ
+//                    echo '<pre>', print_r("пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ"), '</pre>' ;//  2  1 - пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
                     if(!$arSettings['TRIGGERS']['CLIENT_RECEIVED']) {
                         $status_result = 2;
                     }
+                    else $flag_status_break = true;
                     break;
                 case $order_wb['supplierStatus'].'canceled_by_client':
-//                    echo '<pre>', print_r("Отмена заказа клиентом"), '</pre>' ;// 3
+//                    echo '<pre>', print_r("пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ"), '</pre>' ;// 3
                     $status_result = 3;
                     break;
                 case 'cancel'.$order_wb['wbStatus']:
-//                    echo '<pre>', print_r("Отмена заказа поставщиком"), '</pre>' ;// 3
+//                    echo '<pre>', print_r("пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ"), '</pre>' ;// 3
                     if(!$arSettings['TRIGGERS']['CANCEL_TRIGER']) {
                         $status_result = 1;
                     }
+                    else $flag_status_break = true;
                     break;
                 case $order_wb['supplierStatus'].'sold':
-//                    echo '<pre>', print_r("Доставлено клиенту"), '</pre>' ; // 4  2 - Сборочное задание завершено
-                    if(!$arSettings['TRIGGERS']['SKLAD_WB']) {
+//                    echo '<pre>', print_r("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ"), '</pre>' ; // 4  2 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                         $status_result = 4;
-                    }
+                    break;
+                case $order_wb['supplierStatus'].'sorted':
+//                    echo '<pre>', print_r("пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ"), '</pre>' ; // 4  2 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+                        $status_result = 5;
                     break;
                 case 'reject'.$order_wb['wbStatus']:
-//                    echo '<pre>', print_r("Возврат товара"), '</pre>' ; // 6
+//                    echo '<pre>', print_r("пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ"), '</pre>' ; // 6
                     $status_result = 6;
                     break;
                 case 'complete'.$order_wb['wbStatus']:
-//                    echo '<pre>', print_r("Транзит на ПВЗ"), '</pre>' ; // 5
+//                    echo '<pre>', print_r("пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ"), '</pre>' ; // 5
                     $status_result = 5;
                     break;
                 case $order_wb['supplierStatus'].'canceled':
-//                    echo '<pre>', print_r("Не подобран / Отменен"), '</pre>' ; // 1  3 - Сборочное задание отклонено
+//                    echo '<pre>', print_r("пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ / пїЅпїЅпїЅпїЅпїЅпїЅпїЅ"), '</pre>' ; // 1  3 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                     if(!$arSettings['TRIGGERS']['CANCEL_TRIGER']) {
                         $status_result = 1;
                     }
+                    else $flag_status_break = true;
                     break;
                 default:
                     break;
@@ -2122,61 +2124,76 @@ class CMaxyssWb{
             if ($status_result != '' && $arSettings["STATUS_BY"][$status_result] && $arSettings["STATUS_BY"][$status_result] != $status_bx) {
                 $event = new \Bitrix\Main\Event(MAXYSS_WB_NAME, "OnStatusNew", array($id_bx_order, $order_wb));
                 $event->send();
-                $res_status = CSaleOrder::StatusOrder($id_bx_order, $arSettings["STATUS_BY"][$status_result]);
-            }
-        }
-    }
+                // $res_status = CSaleOrder::StatusOrder($id_bx_order, $arSettings["STATUS_BY"][$status_result]);
 
-    public static function getStatusOrdersOld($cabinet = 'DEFAULT', $step = 0){
-        // deprecated
+                $order = Order::load($id_bx_order);
+                $order->setField("STATUS_ID", $arSettings["STATUS_BY"][$status_result]);
 
-        $arSettings = self::settings_wb($cabinet);
+                if(!$flag_status_break) {
+                    if(isset($arSettings["FLAG_CANCELLED_UP"])) {
+                        if ($arSettings["FLAG_CANCELLED_UP"]['status_' . $status_result] == 'Y') {
 
-        $Authorization = $arSettings['AUTHORIZATION'];
-        $limit = $arSettings['COUNT_ORDER'];
+                            $paymentCollection = $order->getPaymentCollection();
+                            foreach ($paymentCollection as $payment) {
+                                $payment->setPaid("N");
+                            }
 
-        $skip = $step*$limit;
+                            $shipmentCollection = $order->getShipmentCollection();
+                            foreach ($shipmentCollection as $shipment) {
+                                if (!$shipment->isSystem()){
+                                    $shipment->disallowDelivery();
+                                    $shipment->setField('DEDUCTED', 'N');
+                                }
+                            }
 
-        $bck = self::bck_wb();
-        if($bck['BCK'] && $bck['BCK'] != "Y") {
-            $date = date("Y-m-d", (time() - (10 * 86400)));
-            $res = array();
-            $data_string = array();
-            $data_string = \Bitrix\Main\Web\Json::encode($data_string);
-            $res = CRestQueryWB::rest_order_na($base_url = WB_BASE_URL, $data_string, "/api/v2/orders?date_start=" . $date . "T00%3A00%3A00%2B03%3A00&take=" . $limit . "&skip=" . $skip, $Authorization);
-            foreach ($res['orders'] as $order_wb) {
-                $arOrdersWb[] = intval($order_wb['orderId']);
-            }
-
-            if(!empty($arOrdersWb)){
-                $data_string = array(
-                    "orderIds" => $arOrdersWb
-                );
-                $data_string = \Bitrix\Main\Web\Json::encode($data_string);
-                $arResultStikers = CRestQueryWB::rest_stickers($base_url = WB_BASE_URL, $data_string, "/api/v2/orders/stickers", $Authorization);
-                $arStiker = array();
-                if(!empty($arResultStikers['data'])){
-                    foreach ($arResultStikers['data'] as $stiker){
-                           $arStiker[$stiker['orderId']] = $stiker;
+                            $order->setField("CANCELED", "Y");
+                        }
+                        elseif ($arSettings["FLAG_CANCELLED_UP"]['status_' . $status_result] == 'N')
+                            $order->setField("CANCELED","N");
                     }
-                }
-            }
-            if (!empty($res) && count($res['orders']) >= 1) {
-                foreach ($res['orders'] as $order_wb) {
-                    if (intval($order_wb['orderId']) > 0 && intval($order_wb["chrtId"]) > 0) {
-                        $id_bx_order = self::getOrder($order_wb['orderId']);
-                        if ($id_bx_order > 0/* && $i <= 8*/) {
-                            if(!empty($arStiker) && isset($arStiker[$order_wb['orderId']])) $ar_stiker = $arStiker[$order_wb['orderId']]; else $ar_stiker = array();
-                            self::setStatus($order_wb, $id_bx_order, $arSettings, $ar_stiker);
+                    if (isset($arSettings["FLAG_CANCELLED_UP"]) && $arSettings["FLAG_CANCELLED_UP"]['status_' . $status_result] != 'Y') {
+                        if (isset($arSettings["FLAG_PAYMENT_UP"])) {
+                            $paymentCollection = $order->getPaymentCollection();
+                            if ($arSettings["FLAG_PAYMENT_UP"]['status_' . $status_result] == 'Y') {
+                                foreach ($paymentCollection as $payment) {
+                                    $payment->setPaid("Y");
+                                }
+                            } elseif ($arSettings["FLAG_PAYMENT_UP"]['status_' . $status_result] == 'N') {
+                                foreach ($paymentCollection as $payment) {
+                                    $payment->setPaid("N");
+                                }
+                            }
+                        }
+                        if (isset($arSettings["FLAG_SHIPMENT_UP"])) {
+                            $shipmentCollection = $order->getShipmentCollection();
+                            if ($arSettings["FLAG_SHIPMENT_UP"]['status_' . $status_result] == 'Y') {
+                                foreach ($shipmentCollection as $shipment) {
+                                    if (!$shipment->isSystem()) {
+                                        $shipment->allowDelivery();
+                                        $shipment->setField('DEDUCTED', 'Y');
+                                    }
+                                }
+                            } elseif ($arSettings["FLAG_SHIPMENT_UP"]['status_' . $status_result] == 'N') {
+                                foreach ($shipmentCollection as $shipment) {
+                                    if (!$shipment->isSystem()) {
+                                        $shipment->disallowDelivery();
+                                        $shipment->setField('DEDUCTED', 'N');
+                                    }
+                                }
+                            }
                         }
                     }
                 }
+                $result = $order->save();
+                if (!$result->isSuccess())
+                {
+                    $eventLog = new \CEventLog;
+                    $eventLog->Add(array("SEVERITY" => 'INFO', "AUDIT_TYPE_ID" => 'change_stпїЅtus_order', "MODULE_ID" => MAXYSS_WB_NAME, "ITEM_ID" => $order->getId(), "DESCRIPTION" => serialize($result->getErrors())));
+                }
+
+
             }
-
-            if (intval($res['total']) > ($skip + $limit)) $step++; else $step = 0;
         }
-
-        return "CMaxyssWb::getStatusOrders('".$cabinet."', ".$step.");";
     }
 
     public static function  setStatus($order_wb = array(), $id_bx_order = 0, $arSettings, $ar_stiker = array()){
@@ -2188,42 +2205,42 @@ class CMaxyssWb{
             $status_result = '';
             switch ($order_wb['status'].$order_wb['userStatus']){
                 case '04':
-//                    echo '<pre>', print_r("Новый"), '</pre>' ; // 0
+//                    echo '<pre>', print_r("пїЅпїЅпїЅпїЅпїЅ"), '</pre>' ; // 0
                     $status_result = 0;
                     break;
                 case '14':
-//                    echo '<pre>', print_r("На сборке"), '</pre>' ;//  2  1 - Принял заказ
+//                    echo '<pre>', print_r("пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ"), '</pre>' ;//  2  1 - пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 
                     if(!$arSettings['TRIGGERS']['CLIENT_RECEIVED']) {
                         $status_result = 2;
                     }
                     break;
                 case $order_wb['status'].'1':
-//                    echo '<pre>', print_r("Отмена заказа клиентом"), '</pre>' ;// 3
+//                    echo '<pre>', print_r("пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ"), '</pre>' ;// 3
                     $status_result = 3;
                     break;
                 case '3'.$order_wb['userStatus']:
-//                    echo '<pre>', print_r("Отмена заказа поставщиком"), '</pre>' ;// 3
+//                    echo '<pre>', print_r("пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ"), '</pre>' ;// 3
                     if(!$arSettings['TRIGGERS']['CANCEL_TRIGER']) {
                         $status_result = 1;
                     }
                     break;
                 case '22':
-//                    echo '<pre>', print_r("Доставлено клиенту"), '</pre>' ; // 4  2 - Сборочное задание завершено
+//                    echo '<pre>', print_r("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ"), '</pre>' ; // 4  2 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                     if(!$arSettings['TRIGGERS']['SKLAD_WB']) {
                         $status_result = 4;
                     }
                     break;
                 case '23':
-//                    echo '<pre>', print_r("Возврат товара"), '</pre>' ; // 6
+//                    echo '<pre>', print_r("пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ"), '</pre>' ; // 6
                     $status_result = 6;
                     break;
                 case '24':
-//                    echo '<pre>', print_r("Транзит на ПВЗ"), '</pre>' ; // 5
+//                    echo '<pre>', print_r("пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ"), '</pre>' ; // 5
                     $status_result = 5;
                     break;
                 case '31':
-//                    echo '<pre>', print_r("Не подобран / Отменен"), '</pre>' ; // 1  3 - Сборочное задание отклонено
+//                    echo '<pre>', print_r("пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ / пїЅпїЅпїЅпїЅпїЅпїЅпїЅ"), '</pre>' ; // 1  3 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                     if(!$arSettings['TRIGGERS']['CANCEL_TRIGER']) {
                         $status_result = 1;
                     }
@@ -2263,39 +2280,6 @@ class CMaxyssWb{
                 }
             }
         }
-    }
-
-    public static function putStatusOrders($id, $status, $Authorization = false)
-    {
-        // deprecated
-
-        if($id !='') {
-            if (!$Authorization) $Authorization = AUTHORIZATION;
-            $res = array();
-            $data_string = array(
-                array(
-                    "orderId" => strval($id),
-                    "status" => intval($status)
-                )
-            );
-            $data_string = \Bitrix\Main\Web\Json::encode($data_string);
-            $res = CRestQueryWB::putStatus($base_url = WB_BASE_URL, $data_string, "/api/v2/orders", $Authorization);
-
-            if($res['success']){
-                $eventLog = new \CEventLog;
-                $eventLog->Add(array("SEVERITY" => 'INFO', "AUDIT_TYPE_ID" => 'PUT_STATUS_ORDER_WB', "MODULE_ID" => MAXYSS_WB_NAME, "ITEM_ID" => $id, "DESCRIPTION" => 'success status '.$status ));
-            }
-            else
-            {
-                $eventLog = new \CEventLog;
-                $eventLog->Add(array("SEVERITY" => 'INFO', "AUDIT_TYPE_ID" => 'PUT_STATUS_ORDER_WB', "MODULE_ID" => MAXYSS_WB_NAME, "ITEM_ID" => $id, "DESCRIPTION" => serialize($res) ));
-            }
-        }
-        else
-        {
-            $res = false;
-        }
-        return $res;
     }
 
     public static function loadNewOrders($cabinet = 'DEFAULT', $print=false){
@@ -2368,10 +2352,10 @@ class CMaxyssWb{
             }
             else
             {
-                if($order_wb['barcode'] != '' && $arSettings["SHKOD"]!=''){
+                if($order_wb['skus'][0] != '' && $arSettings["SHKOD"]!=''){
 
                     $iblock_shkod = $arSettings["SHKOD"];
-                    $arFilterProd = array("PROPERTY_" . $iblock_shkod => $order_wb['barcode']);
+                    $arFilterProd = array("PROPERTY_" . $iblock_shkod => $order_wb['skus'][0]);
                     $res = CIBlockElement::GetList(Array("ID" => "ASC"), $arFilterProd, false, false, $arSelect);
 
                     if ($ob = $res->GetNextElement()) {
@@ -2627,7 +2611,7 @@ class CMaxyssWb{
                         $svg = $prop['VALUE'].FILE_TYPE_STIKER;
                         $FPPath = $_SERVER["DOCUMENT_ROOT"] . '/upload/wb/' . $svg;
                         if($prop["VALUE"] != '') $flag_button = true;
-                        if(!file_exists($FPPath))  $arWbOrders = array(intval($prop['VALUE']));  /// типа что-то не сработало и файл не записался
+                        if(!file_exists($FPPath))  $arWbOrders = array(intval($prop['VALUE']));  /// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ-пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                     }
                 }
 //                $flag_button = true;
@@ -2644,7 +2628,7 @@ class CMaxyssWb{
                 $event = new \Bitrix\Main\Event(MAXYSS_WB_NAME, "OnGetCadrList", array($id_element, &$Authorization, &$supplierID, $params = array()));
                 $event->send();
                 if(!empty($arWbOrders)) {
-                    /// позже посмотрим
+                    /// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                 }
                 ob_start();
                 ?>
@@ -2687,7 +2671,7 @@ class CMaxyssWb{
                         $svg = $prop['VALUE'].FILE_TYPE_STIKER;
                         $FPPath = $_SERVER["DOCUMENT_ROOT"] . '/upload/wb/' . $svg;
                         if($prop["VALUE"] != '') $flag_button = true;
-                        if(!file_exists($FPPath))  $arWbOrders = array(intval($prop['VALUE']));  /// типа что-то не сработало и файл не записался
+                        if(!file_exists($FPPath))  $arWbOrders = array(intval($prop['VALUE']));  /// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ-пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                     }
 }
             }
@@ -2705,7 +2689,7 @@ class CMaxyssWb{
                 $event->send();
 
                 if(!empty($arWbOrders)) {
-                    /// позже посмотрим
+                    /// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                 }
                 ob_start();
                 ?>
@@ -2888,7 +2872,7 @@ class CCustomTypeMaxyssWBProp{
                 if (strlen($row['VALUE']) > 0)
                     $sinc_set = unserialize($row['VALUE']);
 
-                // основной иблок
+                // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
                 $iblock_info = CCatalog::GetByIDExt($IBLOCK_ID);
 
                 if (is_array($iblock_info)) {

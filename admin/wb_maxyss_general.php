@@ -33,7 +33,7 @@ if(CModule::IncludeModuleEx(MAXYSS_WB_NAME) == 3)
 if(Loader::includeModule('catalog') && Loader::includeModule('iblock') && Loader::includeModule(MAXYSS_WB_NAME) && ($GLOBALS['APPLICATION']->GetGroupRight(MAXYSS_WB_NAME) >= "R")){
     $APPLICATION->AddHeadScript("/bitrix/tools/maxyss.wb/filter_conditions/script.js");
 if(($_REQUEST['save'] || $_REQUEST['apply']) && ($GLOBALS['APPLICATION']->GetGroupRight(MAXYSS_WB_NAME) == "W") ){
-    $option = array("ACTIVE_ON"=>"active_on", "LOG_ON"=>"LOG_ON", "AUTHORIZATION"=>"authorization", "UUID"=>"uuid",  "PERIOD"=>"period", "IBLOCK_TYPE"=>"iblock_type", "IBLOCK_ID"=>"iblock_id", "DESCRIPTION"=>"description", "BASE_PICTURE"=>"base_picture", "MORE_PICTURE"=>"more_picture", "NAME_PRODUCT"=>"name_product", "ARTICLE"=>"article", "ARTICLE_LINK"=>"article_link", "SHKOD"=>"shkod", "LAND"=>"land", "PRICE_ON"=>"price_on", "PROMOCODES_ON"=>"promocodes_on", "DISCOUNTS_ON"=>"discounts_on", "PRICE_MAX_MIN"=>"price_max_min", "FILTER_PROP"=>"filter_property", "FILTER_PROP_ID"=>"filter_property_enums", "TP_AS_PRODUCT"=>"tp_as_product", "WAREHOUSES"=>"WAREHOUSES", "DEACTIVATE_WH"=>"DEACTIVATE_WH",  "KGT_WH"=>"KGT_WH", "LIMIT_WAREHOUSE_DBS"=>"LIMIT_WAREHOUSE_DBS", "PRICE_TYPE"=>"price_type", "PRICE_PROP"=>'price_prop', "PRICE_TYPE_PROP"=>"price_type_prop", "PRICE_TYPE_NO_DISCOUNT"=>"price_type_no_discount", "PRICE_TYPE_FORMULA"=>"price_type_formula", "PRICE_TYPE_FORMULA_ACTION"=>"price_type_formula_action","CUSTOM_FILTER"=>'CUSTOM_FILTER');
+    $option = array("ACTIVE_ON"=>"active_on", "LOG_ON"=>"LOG_ON", "AUTHORIZATION"=>"authorization", "UUID"=>"uuid",  "PERIOD"=>"period", "IBLOCK_TYPE"=>"iblock_type", "IBLOCK_ID"=>"iblock_id", "DESCRIPTION"=>"description", "BASE_PICTURE"=>"base_picture", "MORE_PICTURE"=>"more_picture", "NAME_PRODUCT"=>"name_product", "ARTICLE"=>"article", "ARTICLE_LINK"=>"article_link", "SHKOD"=>"shkod", "LAND"=>"land", "PRICE_ON"=>"price_on", "PROMOCODES_ON"=>"promocodes_on", "DISCOUNTS_ON"=>"discounts_on", "PRICE_MAX_MIN"=>"price_max_min", "FILTER_PROP"=>"filter_property", "FILTER_PROP_ID"=>"filter_property_enums", "WAREHOUSES"=>"WAREHOUSES", "DEACTIVATE_WH"=>"DEACTIVATE_WH",  "KGT_WH"=>"KGT_WH", "LIMIT_WAREHOUSE_DBS"=>"LIMIT_WAREHOUSE_DBS", "PRICE_TYPE"=>"price_type", "PRICE_PROP"=>'price_prop', "PRICE_TYPE_PROP"=>"price_type_prop", "PRICE_TYPE_NO_DISCOUNT"=>"price_type_no_discount", "PRICE_TYPE_FORMULA"=>"price_type_formula", "PRICE_TYPE_FORMULA_ACTION"=>"price_type_formula_action","CUSTOM_FILTER"=>'CUSTOM_FILTER');
     CHelpMaxyssWB::saveOption($option);
 
 
@@ -252,7 +252,7 @@ if(($_REQUEST['save'] || $_REQUEST['apply']) && ($GLOBALS['APPLICATION']->GetGro
     $arPeriodAgent = unserialize(Option::get(MAXYSS_WB_NAME, "PERIOD"));
     $arAuthorization = unserialize(Option::get(MAXYSS_WB_NAME, "AUTHORIZATION"));
     if(!empty($arActiveAgent)) {
-        foreach ($arActiveAgent as $cabinet=>$value) { 
+        foreach ($arActiveAgent as $cabinet=>$value) {
             if ($value == 'Y') {
                 $res = CAgent::GetList(Array("ID" => "DESC"), array("NAME" => "CMaxyssWb::uploadAllStocks('".$cabinet."'%"));
 
@@ -356,10 +356,6 @@ if(($_REQUEST['save'] || $_REQUEST['apply']) && ($GLOBALS['APPLICATION']->GetGro
     foreach($arTabs as $key_cab => $arTab)
     {
     $tabControl->BeginNextTab();
-?>
-        <input type="hidden" name="tp_as_product[<?=$arTab["CABINET"]?>]" value="N">
-
-    <?
         // get a list of info blocks
         $iblock_id = '';
 //        $iblock_id = Option::get(MAXYSS_WB_NAME, "IBLOCK_ID", "");
@@ -578,7 +574,7 @@ if(($_REQUEST['save'] || $_REQUEST['apply']) && ($GLOBALS['APPLICATION']->GetGro
         while ($prop_fields = $iblockPropsList->GetNext())
         {
             $iblockProps[$prop_fields['ID']] = $prop_fields;
-            if($prop_fields['USER_TYPE_SETTINGS']["TABLE_NAME"]){
+            if(isset($prop_fields['USER_TYPE_SETTINGS']["TABLE_NAME"]) && $prop_fields['USER_TYPE_SETTINGS']["TABLE_NAME"]){
                 $result = \Bitrix\Highloadblock\HighloadBlockTable::getList(array('filter'=>array('=TABLE_NAME'=>$prop_fields['USER_TYPE_SETTINGS']["TABLE_NAME"])));
                 if($row = $result->fetch())
                 {
@@ -626,7 +622,7 @@ if(($_REQUEST['save'] || $_REQUEST['apply']) && ($GLOBALS['APPLICATION']->GetGro
             while ($prop_fields = $skuPropsList->GetNext())
             {
                 $skuProps[$prop_fields['ID']] = $prop_fields;
-                if($prop_fields['USER_TYPE_SETTINGS']["TABLE_NAME"]){
+                if(isset($prop_fields['USER_TYPE_SETTINGS']["TABLE_NAME"]) && $prop_fields['USER_TYPE_SETTINGS']["TABLE_NAME"]){
                     $result = \Bitrix\Highloadblock\HighloadBlockTable::getList(array('filter'=>array('=TABLE_NAME'=>$prop_fields['USER_TYPE_SETTINGS']["TABLE_NAME"])));
                     if($row = $result->fetch())
                     {
@@ -1382,7 +1378,7 @@ if(($_REQUEST['save'] || $_REQUEST['apply']) && ($GLOBALS['APPLICATION']->GetGro
         $t++;
     }?>
     <?$tabControl->Buttons(array(
-        "back_url"=>MAXYSS_MODULE_NAME."_ozon_maxyss_general.php?lang=".LANGUAGE_ID,
+        "back_url"=>MAXYSS_WB_NAME."_wb_maxyss_general.php?lang=".LANGUAGE_ID,
 
     ));?>
 
