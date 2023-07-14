@@ -1,0 +1,1 @@
+<? require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/maxyss.wb/admin/stock_realy_wb_maxyss.php");?>
