@@ -1,1 +1,0 @@
-<?require($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/maxyss.wb/tools/settings.php');?>
