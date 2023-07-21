@@ -983,6 +983,7 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
         $event = new \Bitrix\Main\Event(MAXYSS_MODULE_NAME, "OnUpdateStock", array(&$items));
         $event->send();
         $arItems = array_chunk($items, 100);
+		$Logger = new TsLogger("/ozon/OzonUploadProduct/");
         foreach ($arItems as $item){
             $data_string = array(
                 'stocks' => $item
@@ -990,8 +991,13 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
             $data_string = \Bitrix\Main\Web\Json::encode($data_string);
             $arResult = array();
 
-            if($bck['BCK'] && $bck['BCK'] != "Y")
-                $arResult = CRestQuery::rest_query($ClientId, $ApiKey, $base_url = OZON_BASE_URL, $data_string, "/v2/products/stocks");
+            if($bck['BCK'] && $bck['BCK'] != "Y"){
+				$Logger->log("LOG", "send - " . json_encode($item));
+				$arResult = CRestQuery::rest_query($ClientId, $ApiKey, $base_url = OZON_BASE_URL, $data_string, "/v2/products/stocks");
+				$r = (array)$arResult;
+                $Logger->log("LOG", "response - " . $r["response"]);
+            }
+
 
             if(\Bitrix\Main\Config\Option::get('maxyss.ozon', "LOG_ON",  "N") == "Y") {
                 $eventLog = new \CEventLog;
@@ -1717,6 +1723,11 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
     if ($id == 1) {
       file_put_contents("/home/bitrix/logs/ozon/wdhs/CheckUpload.txt", print_r('START ' . date("Y-m-d H:i:s") . ' CUR->ID:' .$id, true) . PHP_EOL, FILE_APPEND);
     }
+        /* log */
+        $Logger = new TsLogger("/ozon/OzonUploadProduct/");
+		if ($id == 1) {
+			$Logger->log("LOG", "START\r\n");
+        }
         $arSettings = array();
         $arOptions = CMaxyssOzon::getOptions($lid);
         if($lid !='') {
