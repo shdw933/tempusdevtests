@@ -21,11 +21,6 @@ class CRestQuery{
 
         $str_result = $api->post($path, []);
 
-
-		$Logger = new TsLogger("/ozon/" . str_replace("/", "_", $path) . "/");
-		$Logger->log("LOG", "data_string - ".print_r(json_decode($data_string, true), true));
-		$Logger->log("LOG", "str_result - ".print_r($str_result, true));
-
         if(\Bitrix\Main\Config\Option::get('maxyss.ozon', "LOG_ON",  "N") == "Y") {
             $eventLog = new \CEventLog;
             $eventLog->Add(array("SEVERITY" => 'INFO', "AUDIT_TYPE_ID" => $path, "MODULE_ID" => 'maxyss.ozon', "ITEM_ID" => $ClientId, "DESCRIPTION" => serialize($str_result->info)));
@@ -36,13 +31,35 @@ class CRestQuery{
             if ($str_result->info->http_code == 200) {
 
                 if ($str_result->headers->content_type == 'application/pdf') {
-                    $pdf_stream = $str_result->response;
-                    file_put_contents($_SERVER['DOCUMENT_ROOT'] . "/upload/package-label.pdf", $pdf_stream);
-                    echo json_encode(array('success' => '/upload/package-label.pdf'));
+                    if($path == '/v2/posting/fbs/digital/act/get-pdf'){
+                        $data = \Bitrix\Main\Web\Json::decode($data_string);
+                        $pdf_stream = $str_result->response;
+                        file_put_contents($_SERVER['DOCUMENT_ROOT'] . "/upload/".$data["doc_type"].".pdf", $pdf_stream);
+                        return array('success' => "/upload/".$data["doc_type"].".pdf");
+                    }
+                    else
+                    {
+                        $pdf_stream = $str_result->response;
+                        if($path == '/v2/posting/fbs/act/get-pdf') {
+                            file_put_contents($_SERVER['DOCUMENT_ROOT'] . "/upload/invoice.pdf", $pdf_stream);
+                            return array('success' => '/upload/invoice.pdf');
+//                            echo json_encode(array('success' => '/upload/invoice.pdf'));
+                        }else{
+                            file_put_contents($_SERVER['DOCUMENT_ROOT'] . "/upload/package-label.pdf", $pdf_stream);
+                            echo json_encode(array('success' => '/upload/package-label.pdf'));
+                        }
+                    }
 
                 } else {
                     $arRes = \Bitrix\Main\Web\Json::decode($str_result->response);
-                    $res = $arRes['result'];
+
+                    if($path == '/v2/posting/fbs/digital/act/check-status')
+                        $res = $arRes;
+                    elseif($path == '/v2/posting/fbs/digital/act/get-pdf')
+                        $res = $arRes;
+                    else
+                        $res = $arRes['result'];
+
                     return $res;
                 }
 
