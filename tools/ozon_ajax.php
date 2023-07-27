@@ -750,7 +750,7 @@ if($_REQUEST['action'] == 'add_prop_sinc'){
                     $arAttrSelect[$at['id']] = $at['value'];
                 }
 
-                // основной иблок
+                // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
                 $iblock_info = CCatalog::GetByIDExt(intval($_REQUEST["iblock_id"]));
 
                 if(is_array($iblock_info)) {
@@ -781,7 +781,7 @@ if($_REQUEST['action'] == 'add_prop_sinc'){
                         $selected = 'selected = "selected"';
 
                     if(!empty($arSinc[$iblock_id]['sinc']) && $selected !=''){
-                        // рисуем  синхронизированные значения
+                        // пїЅпїЅпїЅпїЅпїЅпїЅ  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                         $custom_values_table = '';
 
                         $res_prop = CIBlockProperty::GetByID($res_arr_br['ID'], $iblock_id);
@@ -897,7 +897,7 @@ if($_REQUEST['action'] == 'add_prop_sinc'){
 
                         if(!empty($arSinc[$iblock_offers_id]['sinc']) && $selected != ''){
 
-                            // рисуем  синхронизированные значения
+                            // пїЅпїЅпїЅпїЅпїЅпїЅ  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                             $custom_values_table = '';
 
                             $res_prop = CIBlockProperty::GetByID($res_arr_br['ID'], $iblock_offers_id);
@@ -1050,7 +1050,7 @@ if($_REQUEST['action'] == 'arch_to' || $_REQUEST['action'] == 'arch_from'){
                             $prop_flag = '';
                             if (strlen($lid["ARTICLE"]) > 0) $prop_flag = 'PROPERTY_';
 
-                            // запросим товары из битрикса
+                            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                             $arFilterProd = array("ID" => $ids);
                             $arSelect = Array("ID", "NAME", "DETAIL_PAGE_URL", "IBLOCK_ID", 'CATALOG_XML_ID');
                             if ($prop_flag != '')
@@ -1075,14 +1075,14 @@ if($_REQUEST['action'] == 'arch_to' || $_REQUEST['action'] == 'arch_from'){
                                         $sku[] = intval($item['id']);
                                     }
                                 }
-                                elseif( isset($sku_ozon['items']) && empty($sku_ozon['items']) ) { // ответ не корректный с Озона
+                                elseif( isset($sku_ozon['items']) && empty($sku_ozon['items']) ) { // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ
                                     $res['error'] .= GetMessage('MAXYSS_OZON_ID_CABINET_OZON') . $lid["OZON_ID"] . ' - ' . GetMessage('MAXYSS_OZON_ARCH_TO_NO_FOUND_OFFER') . '<br>';
                                 }
-                                else { // ответ не корректный с Озона
+                                else { // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ
                                     $res['error'] .= GetMessage('MAXYSS_OZON_ID_CABINET_OZON') . $lid["OZON_ID"] . ' - ' . $sku_ozon['error'] . '<br>';
                                 }
                             } else {
-                                // не один товар не подходит
+                                // пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                                 $res['error'] .= GetMessage('MAXYSS_OZON_ID_CABINET_OZON') . $lid["OZON_ID"] . ' - ' . GetMessage('MAXYSS_OZON_ARCH_TO_NO_FOUND_OFFER') . '<br>';
                             }
 //echo '<pre>', print_r($sku), '</pre>' ;
@@ -1100,7 +1100,7 @@ if($_REQUEST['action'] == 'arch_to' || $_REQUEST['action'] == 'arch_from'){
                                     $res['success'] = GetMessage('MAXYSS_OZON_ID_CABINET_OZON') . $lid["OZON_ID"] . ' - ' . GetMessage('MAXYSS_OZON_'.strtoupper($_REQUEST['action']).'_ERROR') . '<br>';
                                 }
                             } else {
-                                // нет таких sku на Озоне или нет ответа с Озона
+                                // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ sku пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ
 //                                $res['error'] .= GetMessage('MAXYSS_OZON_ID_CABINET_OZON') . $lid["OZON_ID"] . ' - ' . GetMessage('MAXYSS_OZON_ARCH_TO_NO_FOUND_OFFER') . '<br>';
                                 $res['success'] = GetMessage('MAXYSS_OZON_ID_CABINET_OZON') . $lid["OZON_ID"] . ' - ' . GetMessage('MAXYSS_OZON_'.strtoupper($_REQUEST['action']).'_ERROR') . '<br>';
 
@@ -1116,7 +1116,7 @@ if($_REQUEST['action'] == 'arch_to' || $_REQUEST['action'] == 'arch_from'){
                             $prop_flag = '';
                             if (strlen($lid["ARTICLE"]) > 0) $prop_flag = 'PROPERTY_';
 
-                            // запросим товары из битрикса
+                            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                             $arFilterProd = array("ID" => $ids);
                             $arSelect = Array("ID", "NAME", "DETAIL_PAGE_URL", "IBLOCK_ID", 'CATALOG_XML_ID');
                             if ($prop_flag != '')
@@ -1158,14 +1158,14 @@ if($_REQUEST['action'] == 'arch_to' || $_REQUEST['action'] == 'arch_from'){
                                         $sku[] = intval($item['id']);
                                     }
                                 }
-                                elseif( isset($sku_ozon['items']) && empty($sku_ozon['items']) ) { // ответ не корректный с Озона
+                                elseif( isset($sku_ozon['items']) && empty($sku_ozon['items']) ) { // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ
                                     $res['error'] .= GetMessage('MAXYSS_OZON_ID_CABINET_OZON') . $lid["OZON_ID"] . ' - ' . GetMessage('MAXYSS_OZON_ARCH_TO_NO_FOUND_OFFER') . '<br>';
                                 }
-                                else { // ответ не корректный с Озона
+                                else { // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ
                                     $res['error'] .= GetMessage('MAXYSS_OZON_ID_CABINET_OZON') . $lid["OZON_ID"] . ' - ' . $sku_ozon['error'] . '<br>';
                                 }
                             } else {
-                                // не один товар не подходит
+                                // пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                                 $res['error'] .= GetMessage('MAXYSS_OZON_ID_CABINET_OZON') . $lid["OZON_ID"] . ' - ' . GetMessage('MAXYSS_OZON_ARCH_TO_NO_FOUND_OFFER') . '<br>';
                             }
 //echo '<pre>', print_r($sku), '</pre>' ;
@@ -1183,7 +1183,7 @@ if($_REQUEST['action'] == 'arch_to' || $_REQUEST['action'] == 'arch_from'){
                                     $res['success'] = GetMessage('MAXYSS_OZON_ID_CABINET_OZON') . $lid["OZON_ID"] . ' - ' . GetMessage('MAXYSS_OZON_'.strtoupper($_REQUEST['action']).'_ERROR') . '<br>';
                                 }
                             } else {
-                                // нет таких sku на Озоне или нет ответа с Озона
+                                // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ sku пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ
 //                                $res['error'] .= GetMessage('MAXYSS_OZON_ID_CABINET_OZON') . $lid["OZON_ID"] . ' - ' . GetMessage('MAXYSS_OZON_ARCH_TO_NO_FOUND_OFFER') . '<br>';
                                 $res['success'] = GetMessage('MAXYSS_OZON_ID_CABINET_OZON') . $lid["OZON_ID"] . ' - ' . GetMessage('MAXYSS_OZON_'.strtoupper($_REQUEST['action']).'_ERROR') . '<br>';
                             }
@@ -1193,11 +1193,11 @@ if($_REQUEST['action'] == 'arch_to' || $_REQUEST['action'] == 'arch_from'){
             }
             else
             {
-                $res['error'] .='NO OPTIONS MODULE'; // нет настроек модуля
+                $res['error'] .='NO OPTIONS MODULE'; // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
             }
         }
         else{
-            $res['error'] .= GetMessage('MAXYSS_OZON_NO_ELEMENTS_SELECTED'); // ничего не выбрано
+            $res['error'] .= GetMessage('MAXYSS_OZON_NO_ELEMENTS_SELECTED'); // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         }
     }
         echo \Bitrix\Main\Web\Json::encode($res);
@@ -1237,4 +1237,3 @@ if($_REQUEST['action'] == 'get_mill_id'){
         echo \Bitrix\Main\Web\Json::encode(array('go_run'=>false, 'mess'=>'NOT RIGHT!'));
 }
 ?>
-
