@@ -578,7 +578,7 @@ class CCustomTypeOzonCat{
                                             attr[$(this).data('ozon-attrid')]['values'][0]['value'] = $(this).val();
                                         }
 
-                                        if (type_elem == 'TEXTAREA' && $(this).val()) {
+                                        if (type_elem == 'TEXTAREA' && $(this).val()) { 
                                             attr[$(this).data('ozon-attrid')] = {};
                                             attr[$(this).data('ozon-attrid')].id = $(this).data('ozon-attrid');
                                             attr[$(this).data('ozon-attrid')]['values'] = [];
@@ -928,7 +928,7 @@ class CMaxyssOzonAgent{
                 }
 
 
-                /// С†РµРЅС‹
+                /// цены
                 if ($item['price'] > 0) {
 
                     if($item['old_price'] > 0) {
@@ -946,7 +946,7 @@ class CMaxyssOzonAgent{
                         }
                     }
                 }
-                /// С†РµРЅС‹
+                /// цены
 
             }
             if($err_item) $err = $err . '<b>' .$id_log.' '.$item['name'].'</b> - '.substr($err_item, 0, -2).'<br>';
@@ -961,7 +961,6 @@ class CMaxyssOzonAgent{
             $data_string = array(
                 "items" => $items
             );
-file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
             $data_string = \Bitrix\Main\Web\Json::encode($data_string);
 
             $bck = self::bck();
@@ -983,7 +982,6 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
         $event = new \Bitrix\Main\Event(MAXYSS_MODULE_NAME, "OnUpdateStock", array(&$items));
         $event->send();
         $arItems = array_chunk($items, 100);
-		$Logger = new TsLogger("/ozon/OzonUploadProduct/");
         foreach ($arItems as $item){
             $data_string = array(
                 'stocks' => $item
@@ -991,13 +989,8 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
             $data_string = \Bitrix\Main\Web\Json::encode($data_string);
             $arResult = array();
 
-            if($bck['BCK'] && $bck['BCK'] != "Y"){
-				$Logger->log("LOG", "send - " . json_encode($item));
-				$arResult = CRestQuery::rest_query($ClientId, $ApiKey, $base_url = OZON_BASE_URL, $data_string, "/v2/products/stocks");
-				$r = (array)$arResult;
-                $Logger->log("LOG", "response - " . $r["response"]);
-            }
-
+            if($bck['BCK'] && $bck['BCK'] != "Y")
+                $arResult = CRestQuery::rest_query($ClientId, $ApiKey, $base_url = OZON_BASE_URL, $data_string, "/v2/products/stocks");
 
             if(\Bitrix\Main\Config\Option::get('maxyss.ozon', "LOG_ON",  "N") == "Y") {
                 $eventLog = new \CEventLog;
@@ -1102,26 +1095,9 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
                         // select products to update the price and quantity
                         foreach ($arProducts['items'] as $prod) {
                                 if(is_array($arItemOzon[$prod['offer_id']]['stock'])){
-									// РїСЂРѕРІРµСЂСЏРµРј РґРѕСЃС‚СѓРїРЅРѕСЃС‚СЊ РІ РїСЂР°Р№СЃР°С…
-									$arWarehouse = self::getWarehouseItem($arItemOzon[$prod['offer_id']]["bx_id"], $lid);
-									/*foreach($arWarehouse as $warehouse){
-										if(!$arItemOzon[$prod['offer_id']]['stock'][$warehouse]) continue;
-										$stock = $arItemOzon[$prod['offer_id']]['stock'][$warehouse];
-										$stock_res = self::stock_limits($prod['offer_id'], $stock, $warehouse, $arItemOzon, $arOptions[$lid]);
-
-                                        if($arDeactivateWarehouses[$warehouse] != 'Y') {
-                                            $arUpdateStock[] = array(
-                                                "offer_id" => $prod['offer_id'],
-                                                "stock" => ($stock_res > 0) ? intval($stock_res) : 0,
-                                                "warehouse_id" => $warehouse
-                                            );
-                                        }
-									}*/
-
                                     foreach ($arItemOzon[$prod['offer_id']]['stock'] as $warehouse => $stock) {
                                         $stock_res = self::stock_limits($prod['offer_id'], $stock, $warehouse, $arItemOzon, $arOptions[$lid]);
-                                        if(!$arWarehouse[$warehouse]) $stock_res = 0;
-										if($arDeactivateWarehouses[$warehouse] != 'Y') {
+                                        if($arDeactivateWarehouses[$warehouse] != 'Y') {
                                             $arUpdateStock[] = array(
                                                 "offer_id" => $prod['offer_id'],
                                                 "stock" => ($stock_res > 0) ? intval($stock_res) : 0,
@@ -1143,7 +1119,7 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
                                         (round($arItemOzon[$prod['offer_id']]['price'] / $arItemOzon[$prod['offer_id']]['old_price'], 2)) <= 0.95 &&
                                         ($arItemOzon[$prod['offer_id']]['old_price'] - $arItemOzon[$prod['offer_id']]['price']) >= 10 &&
                                         ($arItemOzon[$prod['offer_id']]['price'] / $arItemOzon[$prod['offer_id']]['old_price']) >= 0.1 &&
-                                        ($arItemOzon[$prod['offer_id']]['price'] / $arItemOzon[$prod['offer_id']]['old_price']) != 1 // РїСЂРѕРІРµСЂРёС‚СЊ!
+                                        ($arItemOzon[$prod['offer_id']]['price'] / $arItemOzon[$prod['offer_id']]['old_price']) != 1 // проверить!
 
                                     ) {
                                         $arPrice["old_price"] = strval($arItemOzon[$prod['offer_id']]['old_price']);
@@ -1177,9 +1153,7 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
                 }
             }
             if (!empty($arUpdateStock)) {
-				file_put_contents("/home/bitrix/logs/arUpdateStock.txt", print_r($arUpdateStock, true), FILE_APPEND);
                 self::update_stock($arUpdateStock, $ClientId, $ApiKey, $base_url, $filename);
-                file_put_contents("/home/bitrix/logs/ozon/wdhs/CheckGet.txt", print_r($arUpdateStock, true) . PHP_EOL, FILE_APPEND);
             }
             if (!empty($arUpdatePrice) && $arOptions[$lid]['NO_UPLOAD_PRICE'] != "Y") {
                 self::update_price($arUpdatePrice, $ClientId, $ApiKey, $base_url, $filename);
@@ -1413,8 +1387,8 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
                     if ($arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['VALUE']) {
                         if ($one_attr['option'] > 0) { // dictionari
                             if ($one_attr['is_collection'] == 1) { //multi_dictionari
-                                if ($arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['USER_TYPE_SETTINGS']['TABLE_NAME']) {  // вЂ”С•вЂ“СВ¬СњвЂћРЊВ»В  Р…В»вЂњвЂ“В»В вЂ”С
-                                    if (is_array($arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['VALUE'])) { // РјРЅРѕР¶РµСЃС‚РІРµРЅРЅРѕРµ СЃРІРѕР№СЃС‚РІРѕ СЃРїРёСЃРѕРє
+                                if ($arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['USER_TYPE_SETTINGS']['TABLE_NAME']) {  // СПРАВОЧНИК БИТРИКСА
+                                    if (is_array($arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['VALUE'])) { // множественное свойство список
                                         foreach ($arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['VALUE'] as $val) {
                                             if(intval($arSinc[$arFields["IBLOCK_ID"]]["sinc"][$val]) > 0) {
                                                 $arOzonAttrTovar[$one_attr['id']]['id'] = intval($one_attr['id']);
@@ -1422,7 +1396,7 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
                                             }
                                         }
                                     }
-                                    elseif ($arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['VALUE'] != '') // РµРґРёРЅРёС‡РЅРѕРµ СЃРІРѕР№СЃС‚РІРѕ СЃРїРёСЃРѕРє
+                                    elseif ($arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['VALUE'] != '') // единичное свойство список
                                     {
                                         if(intval($arSinc[$arFields["IBLOCK_ID"]]["sinc"][$arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['VALUE']]) > 0) {
                                             $arOzonAttrTovar[$one_attr['id']]['id'] = intval($one_attr['id']);
@@ -1431,9 +1405,9 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
                                             );
                                         }
                                     }
-                                } else // вЂ”С•В»вЂ”СњВ  Р…В»вЂњвЂ“В»В вЂ”С
+                                } else // СПИСОК БИТРИКСА
                                 {
-                                    if (is_array($arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['VALUE_ENUM'])) { // РјРЅРѕР¶РµСЃС‚РІРµРЅРЅРѕРµ СЃРІРѕР№СЃС‚РІРѕ СЃРїРёСЃРѕРє
+                                    if (is_array($arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['VALUE_ENUM'])) { // множественное свойство список
                                         foreach ($arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['VALUE_ENUM_ID'] as $val) {
                                             if(intval($arSinc[$arFields["IBLOCK_ID"]]["sinc"][$val]) > 0) {
                                                 $arOzonAttrTovar[$one_attr['id']]['id'] = intval($one_attr['id']);
@@ -1441,7 +1415,7 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
                                             }
                                         }
                                     }
-                                    elseif ($arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['VALUE_ENUM'] != '') // РµРґРёРЅРёС‡РЅРѕРµ СЃРІРѕР№СЃС‚РІРѕ СЃРїРёСЃРѕРє
+                                    elseif ($arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['VALUE_ENUM'] != '') // единичное свойство список
                                     {
                                         if(intval($arSinc[$arFields["IBLOCK_ID"]]["sinc"][$arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['VALUE_ENUM_ID']])>0) {
                                             $arOzonAttrTovar[$one_attr['id']]['id'] = intval($one_attr['id']);
@@ -1452,7 +1426,7 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
                                     }
                                 }
                             } else {
-                                if (is_array($arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['VALUE'])) { // РјРЅРѕР¶РµСЃС‚РІРµРЅРЅРѕРµ СЃРІРѕР№СЃС‚РІРѕ СЃРїРёСЃРѕРє
+                                if (is_array($arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['VALUE'])) { // множественное свойство список
                                     if(intval($arSinc[$arFields["IBLOCK_ID"]]["sinc"][$arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['VALUE_ENUM_ID'][0]]) > 0) {
                                         $arOzonAttrTovar[$one_attr['id']]['id'] = intval($one_attr['id']);
                                         $arOzonAttrTovar[$one_attr['id']]['values'][] = array(
@@ -1460,7 +1434,7 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
                                         );
                                     }
                                 }
-                                else // РµРґРёРЅРёС‡РЅРѕРµ СЃРІРѕР№СЃС‚РІРѕ СЃРїРёСЃРѕРє
+                                else // единичное свойство список
                                 {
                                     if(intval($arSinc[$arFields["IBLOCK_ID"]]["sinc"][$arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['VALUE_ENUM_ID']]) > 0) {
                                         $arOzonAttrTovar[$one_attr['id']]['id'] = intval($one_attr['id']);
@@ -1475,7 +1449,7 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
                         {
                             if (!$arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['USER_TYPE_SETTINGS']['TABLE_NAME']) {
                                 if ($one_attr['is_collection'] == 1) { //multi_value
-                                    if (is_array($arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['VALUE'])) { // РјРЅРѕР¶РµСЃС‚РІРµРЅРЅРѕРµ СЃРІРѕР№СЃС‚РІРѕ С‚РµРєСЃС‚
+                                    if (is_array($arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['VALUE'])) { // множественное свойство текст
                                         foreach ($arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['VALUE'] as $val) {
                                             if($val !='') {
                                                 $arOzonAttrTovar[$one_attr['id']]['id'] = intval(intval($one_attr['id']));
@@ -1483,7 +1457,7 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
                                             }
                                         }
                                     }
-                                    else // РµРґРёРЅРёС‡РЅРѕРµ СЃРІРѕР№СЃС‚РІРѕ С‚РµРєСЃС‚
+                                    else // единичное свойство текст
                                     {
                                         if($arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['VALUE'] !='') {
                                             $arOzonAttrTovar[$one_attr['id']]['id'] = intval(intval($one_attr['id']));
@@ -1493,7 +1467,7 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
                                         }
                                     }
                                 } else {
-                                    if (is_array($arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['VALUE'])) { // РјРЅРѕР¶РµСЃС‚РІРµРЅРЅРѕРµ СЃРІРѕР№СЃС‚РІРѕ С‚РµРєСЃС‚ РёР»Рё С‚РµРєСЃ С‚РёРї HTML
+                                    if (is_array($arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['VALUE'])) { // множественное свойство текст или текс тип HTML
                                         if($arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['VALUE'][0] !='') {
                                             $arOzonAttrTovar[$one_attr['id']]['id'] = intval(intval($one_attr['id']));
                                             $arOzonAttrTovar[$one_attr['id']]['values'][] = array(
@@ -1518,7 +1492,7 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
                             }
                             else
                             {
-                                // РёР· СЃРїСЂР°РІРѕС‡РЅРёРєР° РїРѕР»СѓС‡РёС‚СЊ СЃР»РѕРІРѕ
+                                // из справочника получить слово
                                 $allProp = array();
                                 $hlblock = HL\HighloadBlockTable::getRow([
                                     'filter' => [
@@ -1538,7 +1512,7 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
                                 }
 
                                 if ($one_attr['is_collection'] == 1) { //multi_value
-                                    if (is_array($arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['VALUE'])) { // РјРЅРѕР¶РµСЃС‚РІРµРЅРЅРѕРµ СЃРІРѕР№СЃС‚РІРѕ С‚РµРєСЃС‚
+                                    if (is_array($arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['VALUE'])) { // множественное свойство текст
                                         foreach ($arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['VALUE'] as $val) {
                                             if($allProp[$val] !='') {
                                                 $arOzonAttrTovar[$one_attr['id']]['id'] = intval($one_attr['id']);
@@ -1546,7 +1520,7 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
                                             }
                                         }
                                     }
-                                    else // РµРґРёРЅРёС‡РЅРѕРµ СЃРІРѕР№СЃС‚РІРѕ С‚РµРєСЃС‚
+                                    else // единичное свойство текст
                                     {
                                         if($allProp[$arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['VALUE']] !='') {
                                             $arOzonAttrTovar[$one_attr['id']]['id'] = intval($one_attr['id']);
@@ -1556,7 +1530,7 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
                                         }
                                     }
                                 } else {
-                                    if (is_array($arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['VALUE'])) { // РјРЅРѕР¶РµСЃС‚РІРµРЅРЅРѕРµ СЃРІРѕР№СЃС‚РІРѕ С‚РµРєСЃС‚
+                                    if (is_array($arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['VALUE'])) { // множественное свойство текст
                                         if($allProp[$arProps[$arSinc[$arFields["IBLOCK_ID"]]["prop_code"]]['VALUE'][0]] !='') {
                                             $arOzonAttrTovar[$one_attr['id']]['id'] = intval($one_attr['id']);
                                             $arOzonAttrTovar[$one_attr['id']]['values'][] = array(
@@ -1690,7 +1664,7 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
                                         $arOzonAttrTovar = $SectListGet["UF_CAT_OZON"];
 
                                     $arOzonAttrTovar = CUtil::JsObjectToPhp(htmlspecialchars_decode($arOzonAttrTovar));
-                                    $arSecAttr[$SectListGet['ID']] = $arOzonAttrTovar; // РЅР°РєРѕРїРёС‚РµР»СЊРЅС‹Р№ РјР°СЃСЃРёРІ
+                                    $arSecAttr[$SectListGet['ID']] = $arOzonAttrTovar; // накопительный массив
 
                                     break;
                                 }
@@ -1718,16 +1692,6 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
     }
 
     public static function OzonUploadProduct($lid='', $id=1, $filter = array()){
-		$unq = uniqid();
-		file_put_contents("/home/bitrix/logs/ozon/AfterItemPrepare.txt", date("Y-m-d H:i:s") . " - " . $unq . " - " . $id . "\r\n", FILE_APPEND);
-    if ($id == 1) {
-      file_put_contents("/home/bitrix/logs/ozon/wdhs/CheckUpload.txt", print_r('START ' . date("Y-m-d H:i:s") . ' CUR->ID:' .$id, true) . PHP_EOL, FILE_APPEND);
-    }
-        /* log */
-        $Logger = new TsLogger("/ozon/OzonUploadProduct/");
-		if ($id == 1) {
-			$Logger->log("LOG", "START\r\n");
-        }
         $arSettings = array();
         $arOptions = CMaxyssOzon::getOptions($lid);
         if($lid !='') {
@@ -1765,11 +1729,6 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
 
         if($arSettings['IBLOCK_TYPE'] && $arSettings['IBLOCK_ID'] && $arSettings['PRICE_TYPE'] && $arSettings['SERVER_NAME'] && $arSettings['SITE']) {
 
-			if(CModule::IncludeModule('panel_manager')){
-				$obj = new CPanelUtils();
-				$altArticle = $obj->getAltAnList();
-			}
-
             $IBLOCK_ID = $arSettings['IBLOCK_ID'];
 
             $bdIblockAttr = CIBlock::GetList(
@@ -1806,10 +1765,7 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
             if(!empty($arCustomFilter)){
                 $arFilter[] = $arCustomFilter;
             }
-
-			//$arSettings['MAX_COUNT'] = 1;
-			      file_put_contents("/home/bitrix/logs/ozon/arFilter.txt", print_r($arFilter, true));
-            $res = CIBlockElement::GetList(Array("ID" => "ASC"), $arFilter, false, Array("nTopCount"=>$arSettings['MAX_COUNT'])/*, $arSelect*/); // РїСЂР°РІРєРё
+            $res = CIBlockElement::GetList(Array("ID" => "ASC"), $arFilter, false, Array("nTopCount"=>$arSettings['MAX_COUNT'])/*, $arSelect*/); // правки
 
             $select_counte = $res->SelectedRowsCount();
             if($select_counte < 1) {
@@ -1846,39 +1802,10 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
                     $name_prodact = (is_array($arProps[$arSettings['NAME_PRODACT']]["~VALUE"]))? $arProps[$arSettings['NAME_PRODACT']]["~VALUE"]["TEXT"] : $arProps[$arSettings['NAME_PRODACT']]["~VALUE"];
 
                 if($name_prodact == '') $name_prodact = htmlspecialchars_decode($arFields["NAME"]);
-
-				/* op */
-				// op. Р¤РѕСЂРјРёСЂСѓРµРј РѕРїРёСЃР°РЅРёРµ С‚РѕРІР°СЂР° Рё РЅР°Р·РІР°РЅРёРµ С‚РѕРІР°СЂР°
-				$arSection = getSectionsElement($arFields["ID"]);
-				$dsc1 = $arProps["TYPE"]["VALUE"][0] . " " . mb_strtolower($arSection[0]["NAME"]) . " {$arSection[1]["NAME"]} {$arSection[2]["NAME"]} {$arProps["CML2_ARTICLE"]["VALUE"]}";
-
-				$dsc2 = htmlentities(strip_tags($arFields["PREVIEW_TEXT"]));
-				$dsc3 = htmlentities(strip_tags($arFields["DETAIL_TEXT"]));
-
-				$description = $dsc1 . ($arFields["~PREVIEW_TEXT"] ? " " . $arFields["~PREVIEW_TEXT"] : "") . ($arFields["~DETAIL_TEXT"] ? " " . $arFields["~DETAIL_TEXT"] : "");
-
-				//$Logger = new TsLogger("/ozon/test_description/");
-				//$Logger->log("LOG", $arFields["ID"] . print_r($arLog, true));
-
-				// РїРѕР»СѓС‡Р°РµРј Р°Р»СЊС‚РµСЂРЅР°С‚РёРІРЅС‹Рµ Р°СЂС‚РёРєСѓР»С‹
-				if($altArticle[$arProps["CML2_ARTICLE"]["VALUE"]]){
-					$description = trim($description, "\n");
-					$description .= "\nР”СЂСѓРіРёРµ РЅР°Р·РІР°РЅРёСЏ РјРѕРґРµР»Рё: " . implode(", ", $altArticle[$arProps["CML2_ARTICLE"]["VALUE"]]);
-					//file_put_contents($_SERVER['DOCUMENT_ROOT']."/bitrix/modules/".MAXYSS_MODULE_NAME."/description.txt", print_r($description, true)."\r\n\r\n", FILE_APPEND);
-				}
-
-				$description = trim(str_replace(array("&nbsp;", "&bull;", "&ndash;", "В±", "В«", "В»", "вЂ”", "\r\n", "&plusmn;", "&laquo;", "&raquo;"), array(" ", " - ", "-", "+/-", "'", "'", "-", " ", "+/-", "'", "'"), $description));
-				$description = htmlentities($description);
-
-				$description = ucfirst($description);
-				$name_prodact = $dsc1;
-
-				/* end op */
-
                 $ID = $arFields['ID'];
                 $new_id = $arFields['ID'];
 
-                $brand = GetMessage('OZON_MAXYSS_NO_BRAND');
+                $brand = GetMessage('OZON_MAXYSS_NO_BRAND'); 
                 if($arProps[$arSettings['BRAND_PROP']] != ''){
                     if($arProps[$arSettings['BRAND_PROP']]['PROPERTY_TYPE'] == 'L' || ( $arProps[$arSettings['BRAND_PROP']]['PROPERTY_TYPE'] == 'S' &&  empty($arProps[$arSettings['BRAND_PROP']]['USER_TYPE_SETTINGS']))){
                         $brand = ($arProps[$arSettings['BRAND_PROP']]['VALUE'] != '')? $arProps[$arSettings['BRAND_PROP']]['VALUE'] : GetMessage('OZON_MAXYSS_NO_BRAND');
@@ -1966,8 +1893,6 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
                         $img[] = $imgPath . CFile::GetPath($photo);
                     }
                 }
-				// op. РћР±СЂРµР·Р°РµРј РґРѕ 14 РєР°СЂС‚РёРЅРѕРє. РїРµСЂРІР°СЏ С‚Р°РєР°СЏ Р¶Рµ РєР°Рє РІС‚РѕСЂР°СЏ.
-				$img = array_slice($img, 1, 14);
 
                 $arPrice = array();
                 $lid = $arSettings['SITE'];
@@ -2024,11 +1949,11 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
 
                                 $arOzonAttr = $arOzonAttrTP;
 
-                                // СЃРІРѕР№СЃС‚РІР° -> Р°С‚СЂРёР±СѓС‚С‹
+                                // свойства -> атрибуты
                                 $arOzonAttr = self::getSincAttr($iblock_attr_id, $arOzonAttr, $arFieldsOff, $arPropsOff);
-                                // СЃРІРѕР№СЃС‚РІР° -> Р°С‚СЂРёР±СѓС‚С‹
+                                // свойства -> атрибуты
 
-                                // РїРѕРґР±СЂРѕСЃРёРј РёР· С‚РѕРІР°СЂР° С‚Рѕ С‡РµРіРѕ РЅРµС‚ РІ С‚Рї
+                                // подбросим из товара то чего нет в тп
                                 if(is_array($arOzonAttrTovar) && is_array($arOzonAttr)) {
                                 foreach ($arOzonAttrTovar as $attr_id => $attr_value){
                                     if(!isset($arOzonAttr[$attr_id])){
@@ -2036,7 +1961,7 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
                                     }
                                 }
                                 }
-                                // РїРѕРґР±СЂРѕСЃРёРј РёР· С‚РѕРІР°СЂР° С‚Рѕ С‡РµРіРѕ РЅРµС‚ РІ С‚Рї
+                                // подбросим из товара то чего нет в тп
 
                                 if(is_array($arOzonAttr))
                                 $type = $arOzonAttr[8229]['values'][0]['dictionary_value_id'];
@@ -2050,9 +1975,9 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
                             }else{
                                 $arOzonAttr = $arOzonAttrTovar;
 
-                                // СЃРІРѕР№СЃС‚РІР° -> Р°С‚СЂРёР±СѓС‚С‹
+                                // свойства -> атрибуты
                                 $arOzonAttr = self::getSincAttr($iblock_attr_id, $arOzonAttr, $arFieldsOff, $arPropsOff);
-                                // СЃРІРѕР№СЃС‚РІР° -> Р°С‚СЂРёР±СѓС‚С‹
+                                // свойства -> атрибуты
 
                                 $type = $arOzonAttr[8229]['values'][0]['dictionary_value_id'];
 
@@ -2148,7 +2073,7 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
 
                                 $event = new \Bitrix\Main\Event(MAXYSS_MODULE_NAME, "AfterItemPrepare", array(&$arSku, $arFieldsOff, $arPropsOff, $arSettings));
                                 $event->send();
-                                // РґРѕСЂР°Р±РѕС‚РєРё
+                                // доработки
 
                                 if($arSku['offer_id'] != '') {
                                     $arItemOzon[$arSku['offer_id']] = $arSku;
@@ -2220,28 +2145,10 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
                     $arSku['description'] = $description;;
                     $arSku['category_id'] = intval($category);
                     $arSku['name'] = $name_prodact;
-
-					/* op
                     $arSku['price'] = self::get_price($arSettings['PRICE_TYPE'], $arSettings['PRICE_PROP'], $arSettings['PRICE_TYPE_PROP'], $arSettings['PRICE_TYPE_NO_DISCOUNT'], $arFields['ID'], $lid, $arSettings["PRICE_TYPE_FORMULA"], $arSettings["PRICE_TYPE_FORMULA_ACTION"]);;
                     $arSku['old_price'] = self::get_price($arSettings['PRICE_TYPE_OLD'], $arSettings['PRICE_PROP_OLD'], $arSettings['PRICE_TYPE_OLD_PROP'], $arSettings['PRICE_TYPE_OLD_NO_DISCOUNT'], $arFields['ID'], $lid, $arSettings["PRICE_TYPE_OLD_FORMULA"], $arSettings["PRICE_TYPE_OLD_FORMULA_ACTION"]);
-
-					$arSku['auto_action_enabled'] = 'UNKNOWN';
+                    $arSku['auto_action_enabled'] = 'UNKNOWN';
                     $arSku['min_price'] = self::get_price($arSettings['PRICE_TYPE_MIN'], $arSettings['PRICE_PROP_MIN'], $arSettings['PRICE_TYPE_MIN_PROP'], $arSettings['PRICE_TYPE_MIN_NO_DISCOUNT'], $arFields['ID'], $lid, $arSettings["PRICE_TYPE_MIN_FORMULA"], $arSettings["PRICE_TYPE_MIN_FORMULA_ACTION"]);
-					*/
-
-					$arSku['auto_action_enabled'] = 'UNKNOWN';
-
-					/* op */
-					/*$arPrice = AHCatalog::OnGetOptimalPrice($arFields['ID'], 1, array(), "N", array(), "s1");
-
-					$arSku['price'] = strval($arPrice["RESULT_PRICE"]["DISCOUNT_PRICE"]);
-					$arSku['old_price'] = ($arPrice["RESULT_PRICE"]["BASE_PRICE"] > $arPrice["RESULT_PRICE"]["DISCOUNT_PRICE"] ? strval($arPrice["RESULT_PRICE"]["BASE_PRICE"]) : "");
-					$arSku['min_price'] = "";*/
-
-					$arSku['price'] = self::get_price($arSettings['PRICE_TYPE'], $arSettings['PRICE_PROP'], $arSettings['PRICE_TYPE_PROP'], $arSettings['PRICE_TYPE_NO_DISCOUNT'], $arFields['ID'], $lid, $arSettings["PRICE_TYPE_FORMULA"], $arSettings["PRICE_TYPE_FORMULA_ACTION"]);
-					$arSku['old_price'] = "";
-					$arSku['min_price'] = "";
-					/* end op */
 
                     $arSku['vat'] = self::vat($ar_tovar, $arSettings);
                     $arSku['vendor'] = $brand;
@@ -2253,39 +2160,9 @@ file_put_contents("/home/bitrix/logs/ozon/import.txt", print_r($items, true));
                     $arSku['weight'] = intval($ar_tovar['WEIGHT']);
                     $arSku['weight_unit'] = 'g';
                     $arSku['images'] = $img;
-                    $arSku['primary_image'] = $arSku['color_image'] = $img[0];
+                    $arSku['primary_image'] = $img[0];
                     $arSku['attributes'] = $arAttr;
                     $arSku['stock'] = self::arStock($ar_tovar, $arFields['ID'], $arSettings);
-
-					/* op */
-					// РЅРµС‚ РІ РЅР°Р»РёС‡РёРё, С‚Рѕ 0 РІ stock
-					if(VERSION_OZON_3){
-						foreach($arSku['stock'] as $k => &$v){
-							if(($arProps["AVAILABILITY_RU"]['VALUE_ENUM_ID'] == 514 || !$arSku['price']) && $v > 0){
-								$v = 0;
-							}
-						}
-						unset($v);
-					}else{
-						if($arProps["AVAILABILITY_RU"]['VALUE_ENUM_ID'] == 514 || !$arSku['price']){
-							$arSku['stock'] = 0;
-						}
-					}
-                    $arSku['bx_id'] = $arFields['ID'];
-					//file_put_contents("/home/bitrix/logs/ozon/AfterItemPrepare.txt", print_r($arSku, true) . PHP_EOL);
-
-					/* end op */
-					$arLogg = array(
-						"ID" => $arFields['ID'],
-						//"arPrice" => serialize($arPrice),
-						"arSku" => $arSku,
-						//"stock" => $arSku['stock'],
-						//"price" => $arSku['price'],
-						//"old_price" => $arSku['old_price'],
-						"article_tovar" => $article_tovar,
-					);
-					//$Logger = new TsLogger("/ozon/OzonUploadProduct/");
-					//$Logger->log("LOG", "OnGetOptimalPrice - ".print_r($arLogg, true));
 
                     $event = new \Bitrix\Main\Event(MAXYSS_MODULE_NAME, "AfterItemPrepare", array(&$arSku, $arFields, $arProps, $arSettings));
                     $event->send();
@@ -2368,9 +2245,6 @@ $error_user = array();
                     $arSku['attributes'] = $arAttr;
                     $arSku['stock'] = self::arStock($ar_tovar, $arFields['ID'], $arSettings);
 
-					// op
-                    $arSku['bx_id'] = $ar_tovar['ID'];
-
                     $event = new \Bitrix\Main\Event(MAXYSS_MODULE_NAME, "AfterItemPrepare", array(&$arSku, $arFields, $arProps, $arSettings));
                     $event->send();
 
@@ -2412,30 +2286,19 @@ $error_user = array();
                         unset($val['stock']);
                     }
                     $arItemsIdChunk_import = array_chunk($arItemOzon, 100);
-                    file_put_contents("/home/bitrix/logs/ozon/wdhs/CheckImport.txt", print_r('IMPORT MASSIVE - ' . date("Y-m-d H:i:s"), true) . PHP_EOL, FILE_APPEND);
-                    file_put_contents("/home/bitrix/logs/ozon/wdhs/CheckImport.txt", print_r($arItemsIdChunk_import, true) . PHP_EOL, FILE_APPEND);
                     foreach ($arItemsIdChunk_import as $items_import) {
                         $err = $err . self::import(array_values($items_import), $ClientId, $ApiKey, OZON_BASE_URL, $filename);
                     }
                 }
                 else
                 {
-                    $array_get = array();
-                    file_put_contents("/home/bitrix/logs/ozon/wdhs/CheckGet.txt", print_r('GET MASSIVE - ' . date("Y-m-d H:i:s"), true) . PHP_EOL, FILE_APPEND);
                     self::get_products($arItemID, $arItemOzon, $ClientId, $ApiKey, OZON_BASE_URL, $filename, $lid);
-                    //file_put_contents("/home/bitrix/logs/ozon/wdhs/CheckGet.txt", print_r($array_get, true) . PHP_EOL, FILE_APPEND);
                 }
             }
         }else{
             file_put_contents($_SERVER['DOCUMENT_ROOT'] . "/bitrix/modules/" . MAXYSS_MODULE_NAME . "/log.txt", print_r(GetMessage('OZON_MAXYSS_ERROR_SETTINGS'), true) . PHP_EOL, FILE_APPEND);
 
         }
-        foreach ($arItemOzon as $key => $value) {
-          $arLogItemOzon[] = $key;
-        }
-
-        file_put_contents("/home/bitrix/logs/ozon/wdhs/CheckUpload.txt", print_r($arLogItemOzon, true) . PHP_EOL, FILE_APPEND);
-        file_put_contents("/home/bitrix/logs/ozon/wdhs/CheckUpload.txt", print_r('РЁР°Рі: ' . count($arLogItemOzon), true) . PHP_EOL, FILE_APPEND);
 
         if(!empty($arErrors))
         {
@@ -2443,17 +2306,12 @@ $error_user = array();
             file_put_contents($_SERVER['DOCUMENT_ROOT'] . "/bitrix/modules/" . MAXYSS_MODULE_NAME . "/log.txt", print_r($arErrors, true) . PHP_EOL, FILE_APPEND);
         }
 
-		file_put_contents("/home/bitrix/logs/ozon/AfterItemPrepare.txt", date("Y-m-d H:i:s") . " - " . $unq . " - end\r\n", FILE_APPEND);
 
         if(isset($filter["ID"])) {
             return array('error'=> $err, 'success'=>true);
         }
         else
         {
-          file_put_contents("/home/bitrix/logs/ozon/wdhs/CheckUpload.txt", print_r('END ' . date("Y-m-d H:i:s") . '--> final id' . $new_id, true) . PHP_EOL, FILE_APPEND);
-          file_put_contents("/home/bitrix/logs/ozon/wdhs/CheckUpload.txt", print_r('', true) . PHP_EOL, FILE_APPEND);
-          file_put_contents("/home/bitrix/logs/ozon/wdhs/CheckUpload.txt", print_r('', true) . PHP_EOL, FILE_APPEND);
-          file_put_contents("/home/bitrix/logs/ozon/wdhs/CheckUpload.txt", print_r('', true) . PHP_EOL, FILE_APPEND);
             if (!empty($filter)) return "CMaxyssOzonAgent::OzonUploadProduct('" . $lid . "'," . $new_id . ", " . var_export($filter, true) . ");";
             else return "CMaxyssOzonAgent::OzonUploadProduct('" . $lid . "'," . $new_id . ");";
         }
@@ -2647,7 +2505,7 @@ $error_user = array();
                                             (round($arItemOzon[$prod['offer_id']]['price'] / $arItemOzon[$prod['offer_id']]['old_price'], 2)) <= 0.95 &&
                                             ($arItemOzon[$prod['offer_id']]['old_price'] - $arItemOzon[$prod['offer_id']]['price']) >= 10 &&
                                             ($arItemOzon[$prod['offer_id']]['price'] / $arItemOzon[$prod['offer_id']]['old_price']) >= 0.1 &&
-                                            ($arItemOzon[$prod['offer_id']]['price'] / $arItemOzon[$prod['offer_id']]['old_price']) != 1 // РїСЂРѕРІРµСЂРёС‚СЊ!
+                                            ($arItemOzon[$prod['offer_id']]['price'] / $arItemOzon[$prod['offer_id']]['old_price']) != 1 // проверить!
 
                                         ) {
                                             $arPrice["old_price"] = strval($arItemOzon[$prod['offer_id']]['old_price']);
@@ -2854,8 +2712,6 @@ $error_user = array();
             $USER = new CUser;
         file_put_contents($_SERVER['DOCUMENT_ROOT']."/bitrix/modules/".MAXYSS_MODULE_NAME."/log_order.txt", print_r(date('d.m.y H.i.s').' - start order', true).PHP_EOL);
 
-		file_put_contents($_SERVER['DOCUMENT_ROOT']."/bitrix/modules/".MAXYSS_MODULE_NAME."/log_order2.txt", $GLOBALS["start_unq"] . " - " . print_r(date('d.m.y H.i.s').' - start order', true).PHP_EOL, 8);
-
         $day = $arSettings["PERIOD_ORDER_DAY"];
         $date_to= date("Y-m-d");
         $time_to =  date("H:i:s");
@@ -2882,10 +2738,6 @@ $error_user = array();
                 "financial_data"=> true
             )
         );
-
-		file_put_contents($_SERVER['DOCUMENT_ROOT']."/bitrix/modules/".MAXYSS_MODULE_NAME."/log_order2.txt", $GLOBALS["start_unq"] . " - " . print_r($data_string, true).PHP_EOL, 8);
-
-		file_put_contents($_SERVER['DOCUMENT_ROOT']."/bitrix/modules/".MAXYSS_MODULE_NAME."/log_order.txt", date('d.m.y H.i.s') . " - " . print_r($data_string, true).PHP_EOL, FILE_APPEND);
         if($order_id >0){
             $data_string["filter"]["order_id"] = $order_id;
         }
@@ -2893,7 +2745,7 @@ $error_user = array();
         $bck = self::bck();
         if($bck['BCK'] && $bck['BCK'] != "Y") {
             $result_orders = CRestQuery::rest_query($ClientId, $ApiKey, $base_url = OZON_BASE_URL, $data_string, "/v3/posting/fbs/list");
-            file_put_contents($_SERVER['DOCUMENT_ROOT']."/bitrix/modules/".MAXYSS_MODULE_NAME."/log_order.txt", date('d.m.y H.i.s') . " - " . print_r($result_orders, true).PHP_EOL, FILE_APPEND);
+            file_put_contents($_SERVER['DOCUMENT_ROOT']."/bitrix/modules/".MAXYSS_MODULE_NAME."/log_order.txt", print_r($result_orders, true).PHP_EOL, FILE_APPEND);
         }
         if(isset($result_orders['error'])) {
             file_put_contents($_SERVER['DOCUMENT_ROOT'] . "/bitrix/modules/" . MAXYSS_MODULE_NAME . "/log_order.txt", print_r($result_orders['error']->code . ' - ' . $result_orders['error']->message, true) . PHP_EOL, FILE_APPEND);
@@ -2926,7 +2778,6 @@ $error_user = array();
             }
 
 
-			file_put_contents($_SERVER['DOCUMENT_ROOT']."/bitrix/modules/".MAXYSS_MODULE_NAME."/log_order2.txt", date('d.m.y H.i.s') . " РїРѕР»СѓС‡РёР»Рё Р·Р°РєР°Р·С‹ \r\n", FILE_APPEND);
 
             if(VERSION_OZON_3 && $tpl_integration_type) {
                 if ($result_orders['has_next']) $step++; else $step = 0;
@@ -2961,7 +2812,7 @@ $error_user = array();
                     foreach ($orders as &$order_ozon) {
                         $flag_status_change = false;
 
-                        if($order_ozon['status'] == 'awaiting_approve' || $order_ozon['status'] == 'awaiting_packaging') continue; // РѕР¶РёРґР°РµС‚ РїРѕРґС‚РІРµСЂР¶РґРµРЅРёВ¤
+                        if($order_ozon['status'] == 'awaiting_approve' || $order_ozon['status'] == 'awaiting_packaging') continue; // ожидает подтверждения
 
                         $products = $order_ozon["products"];
                         // get info product
@@ -3383,7 +3234,7 @@ $error_user = array();
 
                 }
             }
-			file_put_contents($_SERVER['DOCUMENT_ROOT']."/bitrix/modules/".MAXYSS_MODULE_NAME."/log_order2.txt", $GLOBALS["start_unq"] . " - " . print_r(date('d.m.y H.i.s').' - end order', true).PHP_EOL, 8);
+
             if($bck['BCK'] && $bck['BCK'] != "Y") {
                 self::OzonGetReturns($lid);
             }
@@ -3456,8 +3307,6 @@ $error_user = array();
             $USER = new CUser;
         file_put_contents($_SERVER['DOCUMENT_ROOT']."/bitrix/modules/".MAXYSS_MODULE_NAME."/log_order_uf.txt", print_r(date('d.m.y H.i.s').' - start order', true).PHP_EOL);
 
-		$start = debug_microtime_float();
-
         $day = $arSettings["PERIOD_ORDER_DAY"];
 //        $date_to= date("Y-m-d");
         $date_to= date("Y-m-d", time()-86400);
@@ -3488,11 +3337,9 @@ $error_user = array();
                     "financial_data"=> true
                 )
             );
-
             $result_orders = CMaxyssOzonAgent::getPostingRecurs($ClientId, $ApiKey, $base_url = OZON_BASE_URL, $data_string, "/v3/posting/fbs/unfulfilled/list", $limit, array('postings'=>array()));
-            file_put_contents($_SERVER['DOCUMENT_ROOT']."/bitrix/modules/".MAXYSS_MODULE_NAME."/log_order_uf.txt", date('d.m.y H.i.s') . " - " . print_r($result_orders, true).PHP_EOL, FILE_APPEND);
-
-		}
+            file_put_contents($_SERVER['DOCUMENT_ROOT']."/bitrix/modules/".MAXYSS_MODULE_NAME."/log_order_uf.txt", print_r($result_orders, true).PHP_EOL, FILE_APPEND);
+        }
         if(isset($result_orders['error'])) {
             file_put_contents($_SERVER['DOCUMENT_ROOT'] . "/bitrix/modules/" . MAXYSS_MODULE_NAME . "/log_order_uf.txt", print_r($result_orders['error']->code . ' - ' . $result_orders['error']->message, true) . PHP_EOL, FILE_APPEND);
         }
@@ -3524,6 +3371,7 @@ $error_user = array();
                 file_put_contents($_SERVER['DOCUMENT_ROOT'] . "/bitrix/modules/" . MAXYSS_MODULE_NAME . "/log_order_uf.txt", print_r(GetMessage('PROPERTY_ORDER_FALSE'), true) . PHP_EOL, FILE_APPEND);
             }
 
+
             if (!empty($result_orders['postings']) && $prop_ozon_code_flag) {
                 $siteId = '';
                 $siteId = $arSettings["SITE"];
@@ -3550,7 +3398,8 @@ $error_user = array();
 
                 $orders = $result_orders["postings"];
 
-                foreach ($orders as $_k => &$order_ozon) {
+                foreach ($orders as &$order_ozon) {
+
                     $flag_status_change = false;
 
                     if($order_ozon['status'] == 'awaiting_approve') continue; //
@@ -3571,6 +3420,7 @@ $error_user = array();
                             ));
                         }
                     }
+
                     // find order to Bitrix
                     $arFilterOrder = array(
                         'PROPERTY_VAL_BY_CODE_' . $prop_ozon_code => $order_ozon['posting_number'],
@@ -3584,6 +3434,7 @@ $error_user = array();
                     $flag_order = false;
                     if ($arOrder = $rsOrders->Fetch()) {
                         $flag_order = true; // order is it
+
                         $order_bitrix = Bitrix\Sale\Order::load($arOrder['ID']);
                         $basket = $order_bitrix->getBasket();
                         $flag_save_order = false;
@@ -3710,6 +3561,7 @@ $error_user = array();
                             }
                         }
 //                                }
+
                         if($flag_save_order){
                             $ro = $order_bitrix->save();
                             if (!$ro->isSuccess()) {
@@ -3942,6 +3794,7 @@ $error_user = array();
                     }
 
                 }
+
             }
         }
         return "CMaxyssOzonAgent::OzonLoadUnfulfilledOrder('" . $lid . "');";
@@ -4005,7 +3858,7 @@ $error_user = array();
 //            $STATUS_BITRIX = $order_bitrix->getField("STATUS_ID");
             $STATUS_BITRIX_KEY = array_search(array_search($order_bitrix->getField("STATUS_ID"), $arStatusBy), $arStatusSort);
             if($STATUS_BITRIX_KEY > 8 && $STATUS_OZON_KEY < 9){
-                // РЅРµ РјРµРЅВ¤РµРј СЃС‚Р°С‚СѓСЃ
+                // не меняем статус
             }
             else
             {
@@ -4015,22 +3868,22 @@ $error_user = array();
 
                     if(array_search($shipment->getField('STATUS_ID'), $arStatusSipmentBitrixBD)){
                         if($arStatusSipmentBitrixBD[$STATUS_OZON] !='')
-                        { // СЃС‚Р°С‚СѓСЃ РѕС‚РіСЂСѓР·РєРё СѓС‡Р°СЃС‚РІСѓРµС‚ РІ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
+                        { // статус отгрузки участвует в синхронизации
                             $shipment->setField('STATUS_ID', $arStatusSipmentBitrixBD[$STATUS_OZON]);
                         }
                     }else{
                         if($arSettings['STATUS_NO_CHANGE'] != 'Y'){
                             if($arStatusSipmentBitrixBD[$STATUS_OZON] !='')
-                            {// СЃС‚Р°С‚СѓСЃ РѕС‚РіСЂСѓР·РєРё СѓС‡Р°СЃС‚РІСѓРµС‚ РІ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
+                            {// статус отгрузки участвует в синхронизации
                                 $shipment->setField('STATUS_ID', $arStatusSipmentBitrixBD[$STATUS_OZON]);
                             }
-                            //else  echo 'СЃС‚Р°С‚СѓСЃ РѕС‚РіСЂСѓР·РєРё РЅРµ РЅР°Р№РґРµРЅ<br>';
+                            //else  echo 'статус отгрузки не найден<br>';
 
                         }else{
-                            // echo 'СЃС‚Р°С‚СѓСЃ РѕС‚РіСЂСѓР·РєРё РЊв‰€ СѓС‡Р°СЃС‚РІСѓРµС‚ РІ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё<br>';
+                            // echo 'статус отгрузки НЕ участвует в синхронизации<br>';
                         }
                     }
-                    // С„Р»Р°Рі РѕС‚РіСЂСѓР·РєРё
+                    // флаг отгрузки
                     if(isset($arFlagSipmentBitrixBD[$STATUS_OZON]) && array_search("Y", $arFlagSipmentBitrixBD)) {
                         $shipment->setField('DEDUCTED', $arFlagSipmentBitrixBD[$STATUS_OZON]);
                         $shipment->setField('ALLOW_DELIVERY', $arFlagSipmentBitrixBD[$STATUS_OZON]);
@@ -4046,9 +3899,9 @@ $error_user = array();
                     }
                 }
 
-                if($arSettings['STATUS_NO_CHANGE'] != 'Y'){ // РіР°Р»РѕС‡РєР° РЊв‰€ СЃС‚РѕРёС‚
-                    if(array_key_exists($order_ozon['status'], $arStatusBy) && $arStatusBy[$order_ozon['status']] != '') { // СЃС‚Р°С‚СѓСЃ РѕР·РѕРЅР° РµСЃС‚СЊ
-                        // РјРµРЅВ¤РµРј  СЃС‚Р°С‚СѓСЃС‹
+                if($arSettings['STATUS_NO_CHANGE'] != 'Y'){ // галочка НЕ стоит
+                    if(array_key_exists($order_ozon['status'], $arStatusBy) && $arStatusBy[$order_ozon['status']] != '') { // статус озона есть
+                        // меняем  статусы
                         $order_bitrix->setField("UPDATED_1C", "N");
                         if ($order_ozon["tpl_integration_type"] == "non_integrated") {
                             if ($order_ozon['status'] == 'awaiting_deliver' && $STATUS_BITRIX_KEY == 0) {
@@ -4066,14 +3919,14 @@ $error_user = array();
                             }
                         }
 
-                    }elseif (!array_key_exists($order_ozon['status'], $arStatusBy) && $arStatusBy[$order_ozon['status']] == ''){ // СЃС‚Р°С‚СѓСЃ Р… РЅРµ РЅР°С€Р»Рё
-                        // РЊв‰€ РјРµРЅВ¤РµРј СЃС‚Р°С‚СѓСЃС‹
+                    }elseif (!array_key_exists($order_ozon['status'], $arStatusBy) && $arStatusBy[$order_ozon['status']] == ''){ // статус Б не нашли
+                        // НЕ меняем статусы
                     }
                 }
                 elseif($arSettings['STATUS_NO_CHANGE'] == 'Y')
-                { //  РіР°Р»РѕС‡РєР° СЃС‚РѕРёС‚
-                    if(array_search($order_bitrix->getField('STATUS_ID'), $arStatusBy)) { // СЃС‚Р°С‚СѓСЃ РѕР·РѕРЅР° РµСЃС‚СЊ
-                        //  РјРµРЅВ¤РµРј
+                { //  галочка стоит
+                    if(array_search($order_bitrix->getField('STATUS_ID'), $arStatusBy)) { // статус озона есть
+                        //  меняем
                         $order_bitrix->setField("UPDATED_1C", "N");
                         if ($order_ozon["tpl_integration_type"] == "non_integrated") {
                             if ($order_ozon['status'] == 'awaiting_deliver'  && $STATUS_BITRIX_KEY == 0) {
@@ -4268,33 +4121,6 @@ $error_user = array();
             }
         }
     }
-
-	/* op
-	Р”РѕСЃС‚СѓРїРЅРѕСЃС‚СЊ С‚РѕРІР°СЂР° РЅР° СЃРєР»Р°РґР°С…. ci_model_delivery РѕР±РЅРѕРІР»СЏРµС‚СЃСЏ РІ CPanelPricelist::updateDateDelivery РїРѕСЃР»Рµ РѕР±РЅРѕРІР»РµРЅРёСЏ РїСЂР°Р№СЃР»РёСЃС‚РѕРІ
-	*/
-	public static function getWarehouseItem($ID = 0, $SITE_ID = "s1"){
-		global $DB;
-		/*
-		22181308118000		OZON
-		1020000286793000	2D
-		1020000289872000	express
-		*/
-		$arWarehouse = [];
-
-		$strSql = "SELECT day_delivery FROM ci_model_delivery WHERE bitrix_id = '{$ID}' AND site_id = '{$SITE_ID}'";
-		$results = $DB->Query($strSql, false, $err_mess.__LINE__);
-
-		if($row = $results->Fetch()){
-			$dayDelivery = (int)$row["day_delivery"];
-			if($dayDelivery == 0){
-				$arWarehouse["22181308118000"] = true;
-				$arWarehouse["1020000289872000"] = true;
-			}else{
-				$arWarehouse["1020000286793000"] = true;
-			}
-		}
-		return $arWarehouse;
-	}
 }
 class CMaxyssOrderList{
     public static function posting_fbs_get($posting, $lid){
@@ -4342,7 +4168,7 @@ class CMaxyssOrderList{
                 {
                     foreach ($arCabinet as $key=>$ozon_id) {
                         if ($ozon_id["OZON_ID"] != '') {
-                            // РїРѕ СЃРєР»Р°РґР°Рј
+                            // по складам
                             $ClientId = $ozon_id["OZON_ID"];
                             $ApiKey = CMaxyssOzon::GetApiKey($ClientId);
                             $warehouses = CRestQuery::rest_query($ClientId, $ApiKey, $base_url = OZON_BASE_URL, "{}", "/v1/warehouse/list");
@@ -4723,12 +4549,12 @@ class CMaxyssOrderList{
                 $prop_ozon_code_flag = true;
                 $prop_ozon_code_id = $props['ID'];
 
-                // РЅРѕРјРµСЂ РѕС‚РїСЂР°РІР»РµРЅРёВ¤
+                // номер отправления
                 $propertyCollection = $order->getPropertyCollection();
                 $somePropValue = $propertyCollection->getItemByOrderPropertyId($prop_ozon_code_id);
                 $posting_number = $somePropValue->getValue();
 
-                // С‚РѕРІР°СЂС‹
+                // товары
                 if($posting_number)
                 {
                     $basket = $order->getBasket();
@@ -4738,7 +4564,7 @@ class CMaxyssOrderList{
                         $product_ids[$basketItem->getField('ID')] = $basketItem->getProductId();
                     }
 
-                    // Р·Р°РїСЂРѕСЃРёРј С‚РѕРІР°СЂС‹ РёР· Р±РёС‚СЂРёРєСЃР°
+                    // запросим товары из битрикса
                     $arFilterProd = array("ID" => $product_ids);
                     $arSelect = Array("ID", "NAME", "DETAIL_PAGE_URL", "IBLOCK_ID", 'CATALOG_XML_ID');
                     if($prop_flag !='')
@@ -4763,7 +4589,7 @@ class CMaxyssOrderList{
                         $items[array_search($arFields['ID'], $product_ids)]["quantity"] = strval($product[$arFields['ID']]['quantity']);
                     }
 
-                    // Р·Р°РїСЂРѕСЃРёРј РјР°СЂРєРёСЂРѕРІРєРё С‚РѕРІР°СЂРѕРІ  РёР· Р·Р°РєР°Р·Р°
+                    // запросим маркировки товаров  из заказа
 
                     $ShipmentCollection = $order->getShipmentCollection();
                     foreach ($ShipmentCollection as $shipment)
@@ -4776,7 +4602,7 @@ class CMaxyssOrderList{
                             $ShipmentItemStore = $shipmentItem->getShipmentItemStoreCollection();
                             foreach ($ShipmentItemStore as $ShipmentItemStoreitem)
                             {
-                                $marking_code = $ShipmentItemStoreitem->getField('MARKING_CODE');//В«РґРµСЃСЊ РїРѕР»СѓС‡Р°РµРј РјР°СЂРєРёСЂРѕРІРѕС‡РЅС‹Р№ РєРѕРґ.
+                                $marking_code = $ShipmentItemStoreitem->getField('MARKING_CODE');//Здесь получаем маркировочный код.
                                 $items[$ShipmentItemStoreitem->getField("BASKET_ID")]['mandatory_mark'][] = strval($marking_code);
                             }
                         }
@@ -4984,7 +4810,7 @@ class CMaxyssOzonStockUpdate{
             }
 
             if (is_array($mxResult))
-            {  // СЌС‚Рѕ вЂњС•
+            {  // это ТП
 
                 foreach ($arIblockIds as $key_site =>$site) {
                     $arIblockId = $site;
@@ -5041,7 +4867,7 @@ class CMaxyssOzonStockUpdate{
                 }
             }
             else
-            { // СЌС‚Рѕ С‚РѕРІР°СЂ
+            { // это товар
                 foreach ($arIblockIds as $key_site =>$site) {
                     $arIblockId = $site;
                     if (isset($arIblockId[$iblock_id]["IBLOCK_ID"]) && $iblock_id == $arIblockId[$iblock_id]["IBLOCK_ID"]) {
@@ -5114,24 +4940,7 @@ class CMaxyssOzonStockUpdate{
 
                                 $price = CMaxyssOzonAgent::get_price($arOptions[$lid]['PRICE_TYPE'], $arOptions[$lid]['PRICE_PROP'], $arOptions[$lid]['PRICE_TYPE_PROP'], $arOptions[$lid]['PRICE_TYPE_NO_DISCOUNT'], $item['id'], $lid, $arOptions[$lid]["PRICE_TYPE_FORMULA"], $arOptions[$lid]["PRICE_TYPE_FORMULA_ACTION"]);
 
-								// РїСЂРѕРІРµСЂСЏРµРј РґРѕСЃС‚СѓРїРЅРѕСЃС‚СЊ РІ РїСЂР°Р№СЃР°С…
-								$arWarehouse = CMaxyssOzonAgent::getWarehouseItem($offer_id, $lid);
-								foreach($arWarehouse as $warehouse){
-									if(!$arVHstock[$warehouse]) continue;
-                                    $amount = $arVHstock[$warehouse];
-									$arItemParam = array($offer_id => array('price'=> $price, 'weight' => $ar_tovar['WEIGHT']));
-                                    $stock_res = CMaxyssOzonAgent::stock_limits($offer_id, $amount, $warehouse, $arItemParam, $arOptions[$lid]);
-
-                                    if($arDeactivateWarehouses[$warehouse] != 'Y') {
-                                        $arStock = array(
-                                            "offer_id" => strval($offer_id),
-                                            "stock" => ($stock_res > 0) ? intval($stock_res) : 0,
-                                            "warehouse_id" => $warehouse
-                                        );
-                                        $items[] = $arStock;
-                                    }
-								}
-                                /*foreach ($arVHstock as $warehouse => $amount) {
+                                foreach ($arVHstock as $warehouse => $amount) {
                                     $arItemParam = array($offer_id=>array('price'=>$price, 'weight'=>$ar_tovar['WEIGHT']));
                                     $stock_res = CMaxyssOzonAgent::stock_limits($offer_id, $amount, $warehouse, $arItemParam, $arOptions[$lid]);
                                     if($arDeactivateWarehouses[$warehouse] != 'Y') {
@@ -5142,10 +4951,9 @@ class CMaxyssOzonStockUpdate{
                                         );
                                         $items[] = $arStock;
                                     }
-                                }*/
+                                }
                             }
                         }
-
                         $filename = $_SERVER['DOCUMENT_ROOT'] . "/bitrix/modules/" . MAXYSS_MODULE_NAME . "/" . $lid . "_log_user_" . date('N') . ".txt";
                         CMaxyssOzonAgent::update_stock($items, $ClientId, $ApiKey, $base_url = OZON_BASE_URL, $filename);
                     }
