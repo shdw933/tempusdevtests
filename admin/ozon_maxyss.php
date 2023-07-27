@@ -195,7 +195,7 @@ if(Loader::includeModule('catalog') && Loader::includeModule('iblock') && Loader
 
 }
 
-// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+// табуляторы
     $by = "id";
     $sort = "asc";
 
@@ -237,7 +237,7 @@ if(Loader::includeModule('catalog') && Loader::includeModule('iblock') && Loader
     ?>
     <form action="<?=MAXYSS_MODULE_NAME?>_ozon_maxyss.php?lang=<?=LANGUAGE_ID?>" method="post">
         <?$tabControl->Begin();
-        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+        // табуляторы
         ?>
         <?
         foreach($arTabs as $key => $arTab)
@@ -1097,7 +1097,7 @@ if(Loader::includeModule('catalog') && Loader::includeModule('iblock') && Loader
             data:{action: 'get_prop_article'},
             success: function(data) {
                 tab.find($('[name*="article"]')).empty().html('<option value=""></option>'+data);
-                tab.find($('[name*="description"]')).empty().html('<option value="DETAIL_TEXT" ><?=GetMessage('MAXYSS_OZON_ANONS_DETAIL')?></option><option value="PREVIEW_TEXT" ><?=GetMessage('MAXYSS_OZON_ANONS_ANONS')?></option><optgroup label="пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ">' + data + '</optgroup>');
+                tab.find($('[name*="description"]')).empty().html('<option value="DETAIL_TEXT" ><?=GetMessage('MAXYSS_OZON_ANONS_DETAIL')?></option><option value="PREVIEW_TEXT" ><?=GetMessage('MAXYSS_OZON_ANONS_ANONS')?></option><optgroup label="Свойства">' + data + '</optgroup>');
                 tab.find($('[name*="barcode"]')).empty().html('<option value=""></option>'+data);
                 tab.find($('[name*="price_type_prop"]')).empty().html('<option value=""></option>'+data);
                 tab.find($('[name*="price_type_old_prop"]')).empty().html('<option value=""></option>'+data);
