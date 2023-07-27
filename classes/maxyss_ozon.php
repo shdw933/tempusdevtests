@@ -20,6 +20,12 @@ class CRestQuery{
 
 
         $str_result = $api->post($path, []);
+
+
+		$Logger = new TsLogger("/ozon/" . str_replace("/", "_", $path) . "/");
+		$Logger->log("LOG", "data_string - ".print_r(json_decode($data_string, true), true));
+		$Logger->log("LOG", "str_result - ".print_r($str_result, true));
+
         if(\Bitrix\Main\Config\Option::get('maxyss.ozon', "LOG_ON",  "N") == "Y") {
             $eventLog = new \CEventLog;
             $eventLog->Add(array("SEVERITY" => 'INFO', "AUDIT_TYPE_ID" => $path, "MODULE_ID" => 'maxyss.ozon', "ITEM_ID" => $ClientId, "DESCRIPTION" => serialize($str_result->info)));

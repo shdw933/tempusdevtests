@@ -1008,7 +1008,7 @@ if (Loader::includeModule('sale') && Loader::includeModule('iblock') && CModule:
                     </td>
                 </tr>
                 <!--соответствие статусов-->
-                
+
                 <tr class="heading">
                     <td colspan="5"><?= GetMessage('MAXYSS_OZON_PERIOD_AGENT') ?></td>
                 </tr>

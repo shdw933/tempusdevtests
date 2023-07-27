@@ -73,7 +73,7 @@ if(Loader::includeModule('catalog') && Loader::includeModule('iblock') && CModul
         $site_select .= '<option '.$selected.' value="'.$arSite['LID'].'">'.'['.$arSite['LID'].'] '.$arSite['NAME'].'</option>';
     }
 
-// табуляторы
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     $by = "id";
     $sort = "asc";
 
@@ -122,11 +122,11 @@ if(Loader::includeModule('catalog') && Loader::includeModule('iblock') && CModul
 <!--            <form class="maxyss_wrap" action="--><?//=MAXYSS_MODULE_NAME?><!--_ozon_maxyss_general.php?lang=--><?//=LANGUAGE_ID?><!--" method="post">-->
                 <input type="checkbox" name="LOG_ON" style="display: none!important;" value="Y">
                 <?$tabControl->Begin();
-                // табуляторы
+                // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                 ?>
                 <?
 
-                // склады
+                // пїЅпїЅпїЅпїЅпїЅпїЅ
                 $dbSklad = CCatalogStore::GetList(
                     array('TITLE'=>'ASC','ID' => 'ASC'),
                     array('ACTIVE' => 'Y'),
@@ -139,7 +139,7 @@ if(Loader::includeModule('catalog') && Loader::includeModule('iblock') && CModul
                     $arSklads[] = $arSklad;
                 }
 
-                // доставки
+                // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                 $arDelivery = \Bitrix\Sale\Delivery\Services\Manager::getActiveList();
                 foreach ($arDelivery as $key_deliver => $deliver){
                     $arDeliverySelect[$key_deliver] = $deliver['NAME'];

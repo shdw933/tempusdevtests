@@ -83,7 +83,7 @@ class CMaxyssGetOzonInfo{
         }
 
         if(!empty($arProduct['result']['items'])){
-            // запустим обновление свойства элементов
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             return array('count_item'=>count($arProduct['result']['items']), 'last_id'=>$arProduct['result']['last_id'], 'items'=>$arProduct['result']['items']);
         }
         else{
@@ -166,7 +166,7 @@ class CMaxyssAdminList{
                             $mxResult = CCatalogSKU::GetInfoByOfferIBlock(
                                 $IBLOCK_ID
                             );
-                            if (is_array($mxResult) && $mxResult['PRODUCT_IBLOCK_ID'] == $lid["IBLOCK_ID"]) {  // это инфоблок ТП
+                            if (is_array($mxResult) && $mxResult['PRODUCT_IBLOCK_ID'] == $lid["IBLOCK_ID"]) {  // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ
                                 $flag_upload_tp = true;
                                 $IBLOCK_ID_PRODUCT = $mxResult['PRODUCT_IBLOCK_ID'];
                             }
