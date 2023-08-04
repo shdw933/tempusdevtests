@@ -772,10 +772,10 @@ if ($firstStep)
                 false,
                 array('ID', 'IBLOCK_SECTION_ID', 'NAME')
             );
-   
+
             while ($section = $sectionIterator->Fetch())
             {
-             
+
                 $section['ID'] = (int)$section['ID'];
                 $section['IBLOCK_SECTION_ID'] = (int)$section['IBLOCK_SECTION_ID'];
                 $arAvailGroups[$section['ID']] = $section;
@@ -1111,6 +1111,7 @@ if (empty($arRunErrors))
                     $offerPropertyFilter,
                     array('USE_PROPERTY_ID' => 'Y', 'PROPERTY_FIELDS' => $propertyFields)
                 );
+                file_put_contents("/home/bitrix/ext_www/tempusshop.ru/bitrix/modules/weblst.avito/opOp.txt", print_r($offers, true) . "\r\n", FILE_APPEND);
                 unset($offerPropertyFilter);
 
                 if (!empty($offers))
@@ -1287,7 +1288,7 @@ if (empty($arRunErrors))
         }
 
         $itemsContent = '';
-		
+
         if (!empty($items))
         {
             foreach ($itemIdsList as $id)
@@ -1855,7 +1856,7 @@ if (empty($arRunErrors))
 
                                  $itemsContent .= "<".$apparel_type.">" . $APPA . "</".$apparel_type.">\n";
                          }
-                    
+
 
                         $itemsContent .= "<Address>".$ADDRESS."</Address>\n";
                         $areas = '';
@@ -1901,7 +1902,7 @@ if (empty($arRunErrors))
                         $site['LID'],
                         array()
                     );
-          
+
                     if (!empty($calculatePrice))
                     {
                         $minPrice = $calculatePrice['RESULT_PRICE']['DISCOUNT_PRICE'];
@@ -1942,10 +1943,10 @@ if (empty($arRunErrors))
 					}
 
 					$arSection = getSectionsElement($row["ID"]);
-					
+
 					$view_title = $arSection[0]["NAME"] . " " . $view_title;
 					$itemsContent .= "<Title>".weblstAvito::weblstavito_text2xml(TruncateText($view_title, $LOAD), $itemOptions)."</Title>\n";
-                    
+
 					/*if($view_title == ''){
                         $itemsContent .= "<Title>".weblstAvito::weblstAvito_text2xml(TruncateText($row['NAME'], $LOAD), $itemOptions)."</Title>\n";
 
@@ -1968,7 +1969,7 @@ if (empty($arRunErrors))
                             $CONDITION = $CONDITION.'_CHILD';
                         }
                         $itemsContent .= "<Condition>" . GetMessage('WEBLST_AVITO_CONDITION_' . $CONDITION) . "</Condition>\n";
-						
+
                     }
 
                     if($ManagerName) {
@@ -2007,7 +2008,7 @@ if (empty($arRunErrors))
                         case  GetMessage('WEBLST_AVITO_MOTO'):
                             $GoodsType = 'VehicleType';
                             break;
-                       
+
                         case  GetMessage('WEBLST_AVITO_ZAP'):
                             $GoodsType = 'TypeId';
                             break;
@@ -2030,7 +2031,7 @@ if (empty($arRunErrors))
 
                         $itemsContent .= "<".$apparel_type.">" . $APPA . "</".$apparel_type.">\n";
                     }
-					
+
 					//$minPrice = $minPrice * 0.9;
 					//$minPrice = round($minPrice, -1);
 					if($arResult["MARGIN"] > 0){
@@ -2283,7 +2284,7 @@ if (empty($arRunErrors))
                         }
                     }
                     $descrdop = $DOPDESCRIPTION;
-					
+
                     if($DOPPROPERTIS){
                         foreach ($DOPPROPERTIS as $code=>$id){
                             $value = weblstAvito::weblstAvito_get_value(
@@ -2304,7 +2305,7 @@ if (empty($arRunErrors))
                         $linkimage = "<Image url=\"".$itemOptions['PROTOCOL'].$itemOptions['SITE_NAME'].CHTTP::urnEncode($imagelink, 'utf-8')."\"/>";
                     }
 				   //$itemsContent .= "<Images><Image url=\"".CHTTP::urnEncode($row['PICTURE'], 'utf-8')."\"/>".$images_list.$linkimage."</Images>";
-                    if (!empty($row['PICTURE']))                  
+                    if (!empty($row['PICTURE']))
 						$itemsContent .= "<Images>".$images_list.$linkimage."</Images>";
 
 					/*1) Нужно перед нашим описанием вставить:
@@ -2318,20 +2319,20 @@ if (empty($arRunErrors))
 					Гарантия 2 года
 
 					Бесплатная доставка по Москве от 3 000 рублей, платная доставка 300р
-					Отправляем заказы Почтой, СДЭК и Боксбери. 
+					Отправляем заказы Почтой, СДЭК и Боксбери.
 
 
 					а затем уже Оригинальные мужские часы ....
 
-					2) В название добавить "Наручные часы". 
+					2) В название добавить "Наручные часы".
 					Получится Наручные часы Casio....*/
-					
-					
+
+
 					$txt = "Оригинальные часы от магазина TEMPUS\r\nРаботаем с 2012 года, 12 тысяч отзывов на Яндекс Маркет, рейтинг 4.9/5\r\nГарантия 2 года\r\nБесплатная доставка по Москве от 3 000 рублей, платная доставка 300р\r\nРаботаем с Авито Доставкой\r\n\r\n";
-					
+
 					$txt .= "Оригинальные " . mb_strtolower($row["PROPERTIES"][126]["VALUE"][0]) . " " . mb_strtolower($arSection[0]["NAME"]) . " {$arSection[1]["NAME"]} {$arSection[2]["NAME"]} {$row["PROPERTIES"][123]["VALUE"]} \r\n ";
-					
-					
+
+
 					$itemsContent .= "<Description><![CDATA[".$txt.$row['DESCRIPTION'].$descriptionFields.$descrdop."]]></Description>\n";
                     $itemsContent .= "</Ad>\n";
                 }
